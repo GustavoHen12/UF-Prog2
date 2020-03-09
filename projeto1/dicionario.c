@@ -2,26 +2,43 @@
 #include<stdlib.h>
 #include<string.h>
 
-int le_dicionario(char* path)
+#define TAM_PALAVRA 30
+#define TAM_ALOCACAO 1000
+
+int le_dicionario(char* path, char*** dici)
 {
-    FILE *dicionario;
-    char texto_str[20];
+    FILE* dicionario;
+    char texto_str[TAM_PALAVRA];
     dicionario = fopen(path, "r");
-    if (dicionario == NULL)
-    {
+    
+    if (dicionario == NULL){
         printf("ocorreu um problema \n");
         return 0;
     }
-    while(fgets(texto_str, 20, dicionario) != NULL)
-        printf("%s \n", texto_str);
+
+    int i = 0;
+    *(dici) = (char**)malloc(TAM_ALOCACAO * sizeof(char *));
+    while(fgets(texto_str, TAM_PALAVRA, dicionario) != NULL)
+    {
+        printf("aqui\n");
+        *(dici[i]) = (char*)malloc(TAM_PALAVRA * sizeof(char));
+        if(i > TAM_ALOCACAO)
+                *(dici) = (char**)malloc(TAM_ALOCACAO * sizeof(char *));
+        *(dici[i]) = texto_str;
+        printf("%s\n", *(dici[i]));
+        i++;
+    }
     fclose(dicionario);
-    return 1; 
+    
+    return 1;
 }
 
 /*no momento so ira testar as funcoes implementadas*/
 int main(int argc, char *argv[ ])
 {
     //argv[1] e o diretorio do dicionario
-    le_dicionario(argv[1]);
+    char *** dici;
+    le_dicionario(argv[1], dici);
+    printf("%s\n", dici[0][0]);
 
 }
