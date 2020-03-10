@@ -1,9 +1,4 @@
-#include<stdio.h>
-#include<stdlib.h>
-#include<string.h>
-
-#define TAM_PALAVRA 30
-#define TAM_ALOCACAO 10000
+#include "dicionario.h"
 
 int le_dicionario(char* path,unsigned char*** dici)
 {
@@ -12,8 +7,8 @@ int le_dicionario(char* path,unsigned char*** dici)
     dicionario = fopen(path, "r");
     
     if (dicionario == NULL){
-        printf("ocorreu um problema \n");
-        return 0;
+        printf("Erro: nao existe dicionario\n");
+        return -1;
     }
     int i = 0, tam = 0;
     *dici = (unsigned char**)malloc(TAM_ALOCACAO * sizeof(unsigned char*));
@@ -29,15 +24,6 @@ int le_dicionario(char* path,unsigned char*** dici)
         tam++;
     }
     fclose(dicionario);
-    return 1;
+    return --tam;
 }
 
-/*no momento so ira testar as funcoes implementadas*/
-int main(int argc, char *argv[ ])
-{
-    //argv[1] e o diretorio do dicionario
-    unsigned char ** dici;
-    le_dicionario(argv[1], &dici);
-    printf("%s\n", dici[0]);
-
-}
