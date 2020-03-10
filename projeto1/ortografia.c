@@ -17,7 +17,7 @@ int main(int argc, char *argv[ ])
     unsigned char letra;
     letra = getchar();
     //for(int i = 0; i < 20; i++)
-    while(letra != 255)
+    while(!feof(stdin))
     {
         printf("%c", letra);
         letra = getchar();
