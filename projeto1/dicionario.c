@@ -3,9 +3,9 @@
 #include<string.h>
 
 #define TAM_PALAVRA 30
-#define TAM_ALOCACAO 1000
+#define TAM_ALOCACAO 10000
 
-int le_dicionario(char* path, char*** dici)
+int le_dicionario(char* path,unsigned char*** dici)
 {
     FILE* dicionario;
     char texto_str[TAM_PALAVRA];
@@ -15,21 +15,20 @@ int le_dicionario(char* path, char*** dici)
         printf("ocorreu um problema \n");
         return 0;
     }
-
-    int i = 0;
-    *(dici) = (char**)malloc(TAM_ALOCACAO * sizeof(char *));
+    int i = 0, tam = 0;
+    *dici = (unsigned char**)malloc(TAM_ALOCACAO * sizeof(unsigned char*));
     while(fgets(texto_str, TAM_PALAVRA, dicionario) != NULL)
     {
-        printf("aqui\n");
-        *(dici[i]) = (char*)malloc(TAM_PALAVRA * sizeof(char));
-        if(i > TAM_ALOCACAO)
-                *(dici) = (char**)malloc(TAM_ALOCACAO * sizeof(char *));
-        *(dici[i]) = texto_str;
-        printf("%s\n", *(dici[i]));
+        if(i > TAM_ALOCACAO){
+            *dici = realloc(*dici, (tam+TAM_ALOCACAO) * sizeof(unsigned char *));
+            i = 0;
+        }
+        (*dici)[tam]=(unsigned char*)malloc(40*sizeof(unsigned char));
+        strcpy((*dici)[tam], texto_str);
         i++;
+        tam++;
     }
     fclose(dicionario);
-    
     return 1;
 }
 
@@ -37,8 +36,8 @@ int le_dicionario(char* path, char*** dici)
 int main(int argc, char *argv[ ])
 {
     //argv[1] e o diretorio do dicionario
-    char *** dici;
-    le_dicionario(argv[1], dici);
-    printf("%s\n", dici[0][0]);
+    unsigned char ** dici;
+    le_dicionario(argv[1], &dici);
+    printf("%s\n", dici[0]);
 
 }
