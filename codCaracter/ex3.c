@@ -1,29 +1,41 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <wchar.h>
+#include <locale.h>
+/*escreva um programa em C para converter um 
+texto em ISO-8859-1 para UTF-8.
 
+0xxx-xxxx
+110x-xxxx 10xx-xxxx
+11000011 10111111
+*/
 int main(int argc, char *argv[ ])
 {
-	unsigned char letra;
-	char conv[256];
-	int i = 0;
-	for(i = 192; i <= 197; i++) conv[i] = 'A';
-	for(i = 200; i <= 203; i++) conv[i] = 'E';
-	for(i = 204; i <= 207; i++) conv[i] = 'I';
-	for(i = 210; i <= 214; i++) conv[i] = 'O';
-	for(i = 217; i <= 220; i++) conv[i] = 'U';
-	for(i = 224; i <= 229; i++) conv[i] = 'a';
-	for(i = 232; i <= 235; i++) conv[i] = 'e';
-	for(i = 236; i <= 239; i++) conv[i] = 'i';
-	for(i = 242; i <= 246; i++) conv[i] = 'o';
-	for(i = 249; i <= 252; i++) conv[i] = 'u';
-	conv[199] = 'C';
-	conv[231] = 'c';
-	while(!feof(stdin))
+	FILE* arq;
+	arq = fopen(argv[1], "r");//le arq iso
+	unsigned int convASCII = 0b01111111, convH = 0b11000011, convL = 0b10111111; 
+	unsigned char letra, low, high;
+	wchar_t letraL;
+	setlocale (LC_CTYPE, "") ;
+	while(!feof(arq))
 	{
-		letra = getchar();
-		if(letra > 160)
-			letra = conv[letra];
-		printf("%c", letra);
+		letra = getc(arq);
+		letraL = 'B';
+		printf("%lc", letraL);
+// 		if(letra < 126)
+// 		{
+// 			letra = letra & convASCII;
+// 			printf("%c", letra);
+// 		}
+// 		else
+// 		{
+// 			low = (letra & 0b00111111) | convL;
+// //			letraL = letraL | low;
+// 			high = (letra >> 5) | convH;
+// //			letraL = letraL | ((convH | high) << 8);
+// 			printf("%lc", letraL);
+// 		}
 	}
+	printf("\n");
 	return 0;
 }

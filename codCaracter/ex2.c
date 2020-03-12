@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-
+#include <locale.h>
 int main(int argc, char *argv[ ])
 {
 	unsigned char letra;
@@ -18,6 +18,11 @@ int main(int argc, char *argv[ ])
 	for(i = 249; i <= 252; i++) conv[i] = 'u';
 	conv[199] = 'C';
 	conv[231] = 'c';
+	conv[206] = 'N';
+	conv[241] = 'n';
+	
+	setlocale (LC_CTYPE, "pt_BR.ISO-8859-1") ;
+	
 	while(!feof(stdin))
 	{
 		letra = getchar();
