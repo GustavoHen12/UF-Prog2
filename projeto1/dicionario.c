@@ -27,3 +27,12 @@ int le_dicionario(char* path,unsigned char*** dici)
     return --tam;
 }
 
+int ehLetra(unsigned char caracter)
+{
+    if((((caracter >= 65) && (caracter <= 90)) ||
+        ((caracter >= 97) && (caracter <= 122)) ||
+        ((caracter >= 192) && (caracter <= 255))) &&
+        ((caracter != 215) && (caracter != 247)))
+        return 1;
+    return 0;
+}
