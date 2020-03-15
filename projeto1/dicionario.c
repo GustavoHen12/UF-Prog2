@@ -19,6 +19,7 @@ int le_dicionario(char* path,unsigned char*** dici)
             i = 0;
         }
         (*dici)[tam]=(unsigned char*)malloc(40*sizeof(unsigned char));
+        texto_str[strcspn (texto_str, "\n")] = 0;
         strcpy((*dici)[tam], texto_str);
         i++;
         tam++;
@@ -35,4 +36,21 @@ int ehLetra(unsigned char caracter)
         ((caracter != 215) && (caracter != 247)))
         return 1;
     return 0;
+}
+
+int estaDicionario(unsigned char**dici, unsigned char *palavra, int high, int low)
+{
+    if(low <= high)
+    {
+        int meio = low + (high-low)/2;
+        int comp = strcmp(palavra, dici[meio]);
+        //printf("%s - %s # %d %d\n", dici[meio], palavra, meio, comp);
+        if(comp == 0)
+            return 1;
+        else if (comp > 0)
+            return estaDicionario(dici, palavra, high, meio+1);
+        else
+            return estaDicionario(dici, palavra, meio-1, low);
+    }
+    return -1;
 }

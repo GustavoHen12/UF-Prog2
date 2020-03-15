@@ -24,27 +24,34 @@ int main(int argc, char *argv[ ])
     
     //LE TEXTO
     unsigned char letra, palavra[MAX], palavraF[MAX];
+    letra = getchar();
     while(!feof(stdin))
     {
-        letra = getchar();
-
         if(ehLetra(letra))
         {
             letra = le_palavra(letra, palavra);
+            if(strlen(palavra) > 1)
+            {
+                formataPalavra(palavra, palavraF);
 
-            formataPalavra(palavra, palavraF);
-
-            //if(estaDicionario(palavra))
-                printf("%s|%s|%c", palavra,palavraF, letra);
-            //else 
-            //    printf("[%s]", palavra);
+                int res = estaDicionario(dicionario, palavraF, tamDicionario, 0);
+                if( res != -1)
+                    printf("%s%c", palavra, letra);
+                else 
+                    printf("[%s]%c", palavra, letra);
+            }
+            else
+            {
+                printf("%s%c", palavra, letra);
+            }   
         }
         else
         {
             printf("%c", letra);
         }
+        
+        letra = getchar();
     }
-
     return 0;
 }
 
@@ -53,26 +60,24 @@ unsigned char le_palavra(unsigned char letra, unsigned char *string)
     string[0] = letra;
     letra = getchar();
     int i = 1;
-    while(ehLetra(letra) && !feof(stdin))
+    while(!feof(stdin) && ehLetra(letra))
     {
         string[i] = letra;
-        letra = getchar();
         i++;
+        letra = getchar();
     }
     string[i] = '\0';
+    if(feof(stdin))
+        return 0;
     return letra;
 }
 
 int  formataPalavra(unsigned char *string, unsigned char *newString)
 {
-    if(string[0] > 96)
-        newString[0] = string[0] - 32;
-    else
-        newString[0] = string[0];
-    int i = 1;
+    int i = 0;
     while (string[i] != '\0')
     {
-        if(string[i] < 96)
+        if((string[i] < 96) || ((string[i] < 223) && (string[i] >= 192)))
             newString[i] = string[i] + 32;
         else
             newString[i] = string[i];

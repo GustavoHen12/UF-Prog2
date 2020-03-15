@@ -13,4 +13,4 @@ int le_dicionario(char* path,unsigned char*** dici);
 //recebe um unsigned char como pararemtro e retorna true se for letra
 int ehLetra(unsigned char caracter);
 
-//int estaDicionario
+int estaDicionario(unsigned char**dici, unsigned char *palavra, int high, int low);
