@@ -14,7 +14,7 @@ int aumentaDicionario(Dicionario *dici)
     return 1;
 }
 
-int adicionaDicionario(Dicionario *dici, unsigned char *palavra)
+int adicionaDicionario(Dicionario *dici, char *palavra)
 {
     if(tamanhoDici(dici) > TAM_ALOCACAO){
             aumentaDicionario(dici);
@@ -63,7 +63,7 @@ int estaDicionario(Dicionario *dici, unsigned char *palavra, int high, int low)
     if(low <= high)
     {
         int meio = low + (high-low)/2;
-        int comp = strcmp(palavra, dici->palavras[meio]);
+        int comp = strcmp((char*)palavra,(char*)dici->palavras[meio]);
         //printf("%s - %s # %d %d\n", dici->palavras[meio], palavra, meio, comp);
         if(comp == 0)
             return 1;

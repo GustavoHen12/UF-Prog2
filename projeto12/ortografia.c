@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <locale.h>
+
 #include "dicionario.h"
 
 #define MAX 20
@@ -40,7 +41,7 @@ int main(int argc, char *argv[ ])
         if(ehLetra(letra))
         {
             letra = le_palavra(letra, palavra);
-            if(strlen(palavra) > 1)
+            if(strlen((char*)palavra) > 1)
             {
                 formataPalavra(palavra, palavraF);
 

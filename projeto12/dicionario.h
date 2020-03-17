@@ -17,7 +17,7 @@ int le_dicionario(char* path, Dicionario* dici);
 
 int iniciaDicionario(Dicionario *dici);
 
-int adicionaDicionario(Dicionario *dici, unsigned char *palavra);
+int adicionaDicionario(Dicionario *dici, char *palavra);
 
 int aumentaDicionario(Dicionario *dici);
 
