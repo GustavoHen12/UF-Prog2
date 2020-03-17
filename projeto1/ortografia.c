@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <string.h>
+#include <locale.h>
+
 #include "dicionario.h"
 
 #define MAX 20
@@ -14,7 +16,7 @@ int main(int argc, char *argv[ ])
     //LE DICIONARIO
     unsigned char ** dicionario;
     int tamDicionario = 0;
-
+    setlocale (LC_CTYPE, "pt_BR.ISO-8859-1");
     //verifica se o dicionario foi passado como parametro
     //ou se ja existe no sistema
     if(argc > 0)
