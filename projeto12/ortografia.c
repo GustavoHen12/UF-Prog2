@@ -7,7 +7,7 @@
 #define MAX 20
 //recebe a primeira letra da palavra e devolve a palvra
 //retorna o primeiro caracter que nao eh palavra
-unsigned char le_palavra(unsigned char letra, unsigned char *string);
+unsigned char le_palavra(unsigned char letra, unsigned char *string, unsigned char *stringMin);
 
 void  formataPalavra(unsigned char *string, unsigned char *newString);
 
@@ -39,15 +39,16 @@ int main(int argc, char *argv[ ])
     {
         if(ehLetra(letra))
         {
-            letra = le_palavra(letra, palavra);
+            letra = le_palavra(letra, palavra, palavraF);
             if(strlen((char*)palavra) > 1)
             {
-                formataPalavra(palavra, palavraF);
+                //formataPalavra(palavra, palavraF);
 
-                if( estaDicionarioIt(&dicionario, palavraF, tamDicionario) != -1)
-                    printf("%s%c", palavra, letra);
-                else
+                if(estaDicionarioIt(&dicionario, palavraF, tamDicionario))
+                //if( estaDicionario(&dicionario, palavraF, tamDicionario-1, 0) != -1)
                     printf("[%s]%c", palavra, letra);
+                else
+                    printf("%s%c", palavra, letra);                    
             }
             else
             {
@@ -63,18 +64,27 @@ int main(int argc, char *argv[ ])
     return 0;
 }
 
-unsigned char le_palavra(unsigned char letra, unsigned char *string)
+unsigned char le_palavra(unsigned char letra, unsigned char *string, unsigned char *stringMin)
 {
     string[0] = letra;
+    if((string[0] < 96) || ((string[0] < 223) && (string[0] >= 192)))
+        stringMin[0] = string[0] + 32;
+    else
+        stringMin[0] = string[0];
     letra = getchar();
     int i = 1;
     while(!feof(stdin) && ehLetra(letra))
     {
         string[i] = letra;
+        if((string[i] < 96) || ((string[i] < 223) && (string[i] >= 192)))
+            stringMin[i] = string[i] + 32;
+        else
+            stringMin[i] = string[i];
         i++;
         letra = getchar();
     }
     string[i] = '\0';
+    stringMin[i] = '\0';
     if(feof(stdin))
         return 0;
     return letra;

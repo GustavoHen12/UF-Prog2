@@ -47,7 +47,9 @@ int le_dicionario(char* path, Dicionario* dici)
     }
     while(fgets(texto_str, TAM_PALAVRA, dicionario) != NULL)
     {
-        
+        if(texto_str[0] == 'p')
+            printf("<> %s", texto_str);
+
         texto_str[strcspn (texto_str, "\n")] = 0;
         adicionaDicionario(dici, texto_str);
     }
@@ -72,7 +74,7 @@ int estaDicionario(Dicionario *dici, unsigned char *palavra, int high, int low)
         else
             return estaDicionario(dici, palavra, meio-1, low);
     }
-    return -1;
+    return 0;
 } 
 
 
@@ -83,7 +85,7 @@ int estaDicionarioIt(Dicionario *dici, unsigned char *palavra, int tam)
     {
         meio = (ini+fim)/2;
         comp = strcmp((char*)palavra,(char*)dici->palavras[meio]);
-        printf("%s - %s # %d %d %d\n", dici->palavras[meio], palavra, meio, ini, fim);
+        //printf("%s - %s # %d %d %d\n", dici->palavras[meio], palavra, meio, ini, fim);
         if(comp == 0)
             return 1;
         else if(comp > 0)
@@ -91,6 +93,5 @@ int estaDicionarioIt(Dicionario *dici, unsigned char *palavra, int tam)
         else
             fim = meio - 1;
     }
-    printf("-> %s %d\n", dici->palavras[meio-1], meio);
-    return -1;
+    return 0;
 }
