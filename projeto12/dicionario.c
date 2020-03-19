@@ -64,7 +64,7 @@ int estaDicionario(Dicionario *dici, unsigned char *palavra, int high, int low)
     {
         int meio = low + (high-low)/2;
         int comp = strcmp((char*)palavra,(char*)dici->palavras[meio]);
-        //printf("%s - %s # %d %d\n", dici->palavras[meio], palavra, meio, comp);
+        //printf("%s - %s # %d %d \n", dici->palavras[meio], palavra, meio, high, low);
         if(comp == 0)
             return 1;
         else if (comp > 0)
@@ -74,3 +74,23 @@ int estaDicionario(Dicionario *dici, unsigned char *palavra, int high, int low)
     }
     return -1;
 } 
+
+
+int estaDicionarioIt(Dicionario *dici, unsigned char *palavra, int tam)
+{
+    int comp, meio, ini = 0, fim = tam-1;
+    while(fim >= ini)
+    {
+        meio = (ini+fim)/2;
+        comp = strcmp((char*)palavra,(char*)dici->palavras[meio]);
+        printf("%s - %s # %d %d %d\n", dici->palavras[meio], palavra, meio, ini, fim);
+        if(comp == 0)
+            return 1;
+        else if(comp > 0)
+            ini = meio + 1;
+        else
+            fim = meio - 1;
+    }
+    printf("-> %s %d\n", dici->palavras[meio-1], meio);
+    return -1;
+}

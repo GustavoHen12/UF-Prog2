@@ -18,13 +18,12 @@ int main(int argc, char *argv[ ])
     setlocale (LC_CTYPE, "pt_BR.ISO-8859-1");
     
     //LE DICIONARIO
-    Dicionario dicionario, diciErradas;
+    Dicionario dicionario;
     int tamDicionario;
 
     //verifica se o dicionario foi passado como parametro
     //ou se ja existe no sistema
     iniciaDicionario(&dicionario);
-    iniciaDicionario(&diciErradas);
 
     if(argc > 0)
         le_dicionario("/usr/share/dict/brazilian", &dicionario);
@@ -45,7 +44,7 @@ int main(int argc, char *argv[ ])
             {
                 formataPalavra(palavra, palavraF);
 
-                if( estaDicionario(&dicionario, palavraF, tamDicionario, 0) != -1)
+                if( estaDicionarioIt(&dicionario, palavraF, tamDicionario) != -1)
                     printf("%s%c", palavra, letra);
                 else
                     printf("[%s]%c", palavra, letra);
@@ -59,7 +58,6 @@ int main(int argc, char *argv[ ])
         {
             printf("%c", letra);
         }
-        
         letra = getchar();
     }
     return 0;

@@ -24,3 +24,5 @@ int aumentaDicionario(Dicionario *dici);
 int tamanhoDici(Dicionario *dici);
 
 int estaDicionario(Dicionario *dici, unsigned char *palavra, int high, int low);
+
+int estaDicionarioIt(Dicionario *dici, unsigned char *palavra, int tam);
