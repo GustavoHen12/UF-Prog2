@@ -7,7 +7,8 @@
 #define MAX 20
 //recebe a primeira letra da palavra e devolve a palvra
 //retorna o primeiro caracter que nao eh palavra
-unsigned char le_palavra(unsigned char letra, unsigned char *string, unsigned char *stringMin);
+unsigned char leFormata_palavra(unsigned char letra, unsigned char *string, unsigned char *stringMin);
+unsigned char le_palavra(unsigned char letra, unsigned char *string);
 
 void  formataPalavra(unsigned char *string, unsigned char *newString);
 
@@ -24,12 +25,18 @@ int main(int argc, char *argv[ ])
     //verifica se o dicionario foi passado como parametro
     //ou se ja existe no sistema
     iniciaDicionario(&dicionario);
-
+    int resposta;
     if(argc > 0)
-        le_dicionario("/usr/share/dict/brazilian", &dicionario);
+        resposta = le_dicionario(argv[1], &dicionario);
     else
-        le_dicionario(argv[1], &dicionario);
+        resposta = le_dicionario("/usr/share/dict/brazilian", &dicionario);
     
+    if(!resposta)
+    {
+        perror("nao foi possivel abrir este dicionario");
+        exit(1);
+    }
+
     tamDicionario = tamanhoDici(&dicionario);
 
     //LE TEXTO
@@ -39,16 +46,18 @@ int main(int argc, char *argv[ ])
     {
         if(ehLetra(letra))
         {
-            letra = le_palavra(letra, palavra, palavraF);
+            letra = leFormata_palavra(letra, palavra, palavraF);
+            //letra = le_palavra(letra, palavra);
             if(strlen((char*)palavra) > 1)
             {
                 //formataPalavra(palavra, palavraF);
 
                 if(estaDicionarioIt(&dicionario, palavraF, tamDicionario))
                 //if( estaDicionario(&dicionario, palavraF, tamDicionario-1, 0) != -1)
-                    printf("[%s]%c", palavra, letra);
+                    printf("%s%c", palavra, letra);
                 else
-                    printf("%s%c", palavra, letra);                    
+                    printf("[%s]%c", palavra, letra);  
+                                        
             }
             else
             {
@@ -63,8 +72,24 @@ int main(int argc, char *argv[ ])
     }
     return 0;
 }
+unsigned char le_palavra(unsigned char letra, unsigned char *string)
+{
+    string[0] = letra;
+    letra = getchar();
+    int i = 1;
+    while(!feof(stdin) && ehLetra(letra))
+    {
+        string[i] = letra;
+        i++;
+        letra = getchar();
+    }
+    string[i] = '\0';
+    if(feof(stdin))
+        return 0;
+    return letra;
+}
 
-unsigned char le_palavra(unsigned char letra, unsigned char *string, unsigned char *stringMin)
+unsigned char leFormata_palavra(unsigned char letra, unsigned char *string, unsigned char *stringMin)
 {
     string[0] = letra;
     if((string[0] < 96) || ((string[0] < 223) && (string[0] >= 192)))

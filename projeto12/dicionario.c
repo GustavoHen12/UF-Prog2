@@ -41,15 +41,11 @@ int le_dicionario(char* path, Dicionario* dici)
     char texto_str[TAM_PALAVRA];
     dicionario = fopen(path, "r");
     
-    if (dicionario == NULL){
-        perror("nao foi possivel abrir este dicionario");
-        return -1;
-    }
+    if (dicionario == NULL)
+        return 0;
+
     while(fgets(texto_str, TAM_PALAVRA, dicionario) != NULL)
     {
-        if(texto_str[0] == 'p')
-            printf("<> %s", texto_str);
-
         texto_str[strcspn (texto_str, "\n")] = 0;
         adicionaDicionario(dici, texto_str);
     }
