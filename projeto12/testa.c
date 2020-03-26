@@ -4,14 +4,14 @@
 
 #define TAM_PALAVRA 30
 
-int main(int argc, char *argv[ ])
+int main()
 {
     setlocale (LC_CTYPE, "pt_BR.ISO-8859-1");
 
     FILE* dicionario;
     char texto_str[TAM_PALAVRA];
-    //dicionario = fopen("/Documentos/UFPR/brazilian", "r");
-    dicionario = fopen(argv[1], "r");
+    dicionario = fopen("/usr/share/dict/brazilian", "r");
+    
     if (dicionario == NULL){
         printf("Erro: nao existe dicionario\n");
         return -1;
