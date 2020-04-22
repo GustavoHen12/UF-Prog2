@@ -1,6 +1,7 @@
 #include<stdio.h>
 #include<stdlib.h>
 
+#define MAX 100
 //tamanho dos dados
 //dados, ordenados, em um vetor de float
 typedef struct erre{
@@ -8,7 +9,9 @@ typedef struct erre{
     float *data;
 } tERRE;
 
-tERRE* stringToErre();
+int inicia(tERRE *dados);
+
+int stringToErre(char *str, tERRE* dados);
 
 //imprime o dispositivo
 //retorna uma matriz com os valores

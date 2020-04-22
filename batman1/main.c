@@ -1,15 +1,48 @@
 #include<stdio.h>
 #include<stdlib.h>
+#include <string.h>
+#include <locale.h>
 
 #include "erre.h"
 
-void main(int argc, char *argv[ ])
-{
-    //pega arquivo
+#define TAM 400
 
-    //carrega em memoria
+void readData(char *path, char** str)
+{
+    char digito;
+    int tam = 0, i = 0;
+    *str = malloc(TAM * sizeof(char));
+
+    FILE *file;
+    file = fopen(path, "r");
+    while(!feof(file))
+    {
+        digito = getc(file);
+        if(i >= TAM){
+            *str = realloc(*str, (tam+TAM) * sizeof(char));
+            i = 0;
+        }
+        (*str)[tam] = digito;
+        //printf("%c", (*str)[tam]);
+        tam++;
+        i++;
+    }
+    (*str)[tam] = '\0';
+}
+
+int main(int argc, char *argv[ ])
+{
+    setlocale (LC_CTYPE, "pt_BR.ISO-8859-1");
+    //pega arquivo e carrega em memoria
+    char *dados;
+    readData(argv[1], &dados);
+    printf("> %s \n", dados);
 
     //cria no formato da biblioteca
+    tERRE dataset;
+    inicia(&dataset);
+    printf("\niniciou\n");
+    stringToErre(dados, &dataset);
 
     //mostra ramo e folhas
 
