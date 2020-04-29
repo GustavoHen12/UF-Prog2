@@ -23,7 +23,6 @@ void readData(char *path, char** str)
             i = 0;
         }
         (*str)[tam] = digito;
-        //printf("%c", (*str)[tam]);
         tam++;
         i++;
     }
@@ -41,10 +40,9 @@ int main(int argc, char *argv[ ])
     //cria no formato da biblioteca
     tERRE dataset;
     inicia(&dataset);
-    printf("\niniciou\n");
     stringToErre(dados, &dataset);
 
     //mostra ramo e folhas
-
+    ramoEfolhas(&dataset, 2);
     //5numeros
 }

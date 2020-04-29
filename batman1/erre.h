@@ -15,7 +15,7 @@ int stringToErre(char *str, tERRE* dados);
 
 //imprime o dispositivo
 //retorna uma matriz com os valores
-float **ramoEfolhas(tERRE dados, int quantRamos);
+float **ramoEfolhas(tERRE* dados, int quantRamos);
 
 //imprime o dispositivo
 //retorna um vetor com os valores na ordem:
