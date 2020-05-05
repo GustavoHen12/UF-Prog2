@@ -20,7 +20,7 @@ float **ramoEfolhas(tERRE* dados, int quantRamos);
 //imprime o dispositivo
 //retorna um vetor com os valores na ordem:
 //minino, 1quartil, mediana, 3quartil, maximo 
-float *cincoNumeros(tERRE dados);
+float *cincoNumeros(tERRE* dados);
 
 float *outliars(tERRE dados);
 

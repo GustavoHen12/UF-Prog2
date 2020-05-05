@@ -147,14 +147,16 @@ float **ramoEfolhas(tERRE* dados, int quantRamos)
     int digitos = 2;
     if((quantRamos != 2) && (quantRamos != 5) && (quantRamos != 1))
         return NULL;
-    printf("\nRamo e folhas\n");
+    printf("\n**** Ramo e folhas ****\n");
     float **matriz;
     
+    int inicio = selecionaDigito(dados->data[0], digitos);
+    int fim = selecionaDigito(dados->data[dados->tam-1], digitos);
+    
     int linhas, colunas;
-    linhas = (selecionaDigito(dados->data[dados->tam-1], digitos) -
-              selecionaDigito(dados->data[0], digitos)) * quantRamos;
+    linhas = (fim - inicio + 1) * quantRamos;
     colunas = dados->tam; //alterar para algo melhor
-    printf(">%d \n", linhas);
+    printf("> %d, %d \n", linhas, dados->tam);
 
     //aloca matriz
     matriz = alocaMatriz(linhas, colunas);
@@ -163,22 +165,23 @@ float **ramoEfolhas(tERRE* dados, int quantRamos)
 
     //inicia processo
     //coloca na matriz e imprime ao mesmo tempo
-    int i = -1;
-    int inicio = selecionaDigito(dados->data[0], digitos);
-    int fim = selecionaDigito(dados->data[dados->tam-1], digitos);
+    int i = -1, j = 0, k = -1;
     int ramo = 0;
     int limites[2] = {4, 9};
     while((i < dados->tam) && (inicio <= fim))
     {
         printf("%d |", inicio);
+        matriz[j][k] = inicio;
         while( (selecionaDigito(dados->data[i+1], digitos) == inicio) &&
                (ultimoDigito(dados->data[i+1]) <= limites[ramo]) &&
                (i < dados->tam))
         {
-            i++;
+            i++; k++;
             printf("%.2f ", dados->data[i]);
+            matriz[j][k] = dados->data[i];
         }
         printf("\n");
+        j++;
         ramo++;
         if(ramo == quantRamos)
         {
@@ -186,8 +189,16 @@ float **ramoEfolhas(tERRE* dados, int quantRamos)
             inicio++;
        }
     }
-
+    
     return matriz;
+}
+
+//imprime o dispositivo
+//retorna um vetor com os valores na ordem:
+//minino, 1quartil, mediana, 3quartil, maximo 
+float *cincoNumeros(tERRE* dados)
+{
+    float*
 }
 
 
