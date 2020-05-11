@@ -44,5 +44,7 @@ int main(int argc, char *argv[ ])
 
     //mostra ramo e folhas
     ramoEfolhas(&dataset, 2);
+
     //5numeros
+    cincoNumeros(&dataset);
 }
