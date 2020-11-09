@@ -1,6 +1,1 @@
-UTF-8 (8-bit Unicode Transformation Format) is a variable width character 
-encoding capable of encoding all 1,112,064[nb 1] valid code points in Unicode
-using one to four one-byte (8-bit) code units. The encoding is defined by the
-Unicode Standard, and was originally designed by Ken Thompson and Rob Pike.[1][2] 
-The name is derived from Unicode (or Universal Coded Character Set) Transformation
-Format – 8-bit
+UTF-8 (8-bit Unicode Transformation Format) is a variable width character encoding capable of encoding all 1,112,064[nb 1] valid code points in Unicode using one to four one-byte (8-bit) code units. The encoding is defined by the Unicode Standard, and was originally designed by Ken Thompson and Rob Pike.[1][2] The name is derived from Unicode (or Universal Coded Character Set) Transformation Format – 8-bit
