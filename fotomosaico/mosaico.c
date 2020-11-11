@@ -14,8 +14,8 @@
 //tiles.h
 
 int main (){
-    PPMImage *image;
-    image = readPPM("image.ppm");
+   
+   readPPM("image.ppm");
 
-    return 0;
+   return 0;
 }

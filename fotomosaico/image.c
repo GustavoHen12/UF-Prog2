@@ -1,78 +1,67 @@
 #include "image.h"
+//temp
 
-static PPMImage *readPPM(const char *filename)
-{
-         char buff[16];
-         PPMImage *img;
-         FILE *fp;
-         int c, rgb_comp_color;
-         //open PPM file for reading
-         fp = fopen(filename, "rb");
-         if (!fp) {
-              fprintf(stderr, "Unable to open file '%s'\n", filename);
-              exit(1);
-         }
+#define MAX_HEIGH 2160
+#define MAX_WIDTH 4096
+void printLog(char *info, char *str){
+     printf("[%s]: %s\n", info, str);
+}
 
-         //read image format
-         if (!fgets(buff, sizeof(buff), fp)) {
-              perror(filename);
-              exit(1);
-         }
+void cleanComents(FILE *file){
+     char firstChar;
+     firstChar = fgetc(file);
+     while ((firstChar == '#') || (firstChar == '\n')){
+          while(firstChar != '\n')
+               firstChar = fgetc(file);
+          firstChar = fgetc(file);
+     }     
+     fseek(file, -1*sizeof(char), SEEK_CUR);
+}
 
-    //check the image format
-    if (buff[0] != 'P' || buff[1] != '6') {
-         fprintf(stderr, "Invalid image format (must be 'P6')\n");
+imagePPM *readPPM(const char *filename){
+     //informacoes da imagem
+     int maxValue = 0;
+     imagePPM *image;
+     //PPMImage *img;
+     FILE *imageFile;
+     imageFile = fopen(filename, "r");
+     if(!imageFile){
+          perror("Não foi possivel abrir a imagem!");
+          exit(1);
+     }
+     image = malloc(sizeof(imagePPM));
+     //verificar tipo da imagem
+     fgets(image->type, STR_IMAGE_TYPE_SIZE, imageFile);
+     printLog("TIPO IMAGEM", image->type);
+
+     cleanComents(imageFile);
+     
+     fscanf(imageFile, "%d", &image->height);
+     fscanf(imageFile, "%d", &image->width);
+
+     cleanComents(imageFile);
+
+     fscanf(imageFile, "%d", &maxValue);
+     if(maxValue != 255){
+          perror("Esta imagem não possui um formato valido");
+          exit(1);
+     }
+
+     cleanComents(imageFile);
+     image->data = malloc(image->height * image->width * sizeof(pixel));
+     if(strcmp(image->type, "P3") == 0){
+          printf("LE TIPO P3 \n");
+     }
+     else{
+          printf("LE TIPO P6 \n");
+     }
+     fclose(imageFile);
+     return image;
+}
+
+imagePPM *P6read(imagePPM *image, FILE *file){
+     if (fread(image->data, 3 * image->height, image->width, file) != image->height) {
+         fprintf(stderr, "Error loading image \n");
          exit(1);
     }
-
-    //alloc memory form image
-    img = (PPMImage *)malloc(sizeof(PPMImage));
-    if (!img) {
-         fprintf(stderr, "Unable to allocate memory\n");
-         exit(1);
-    }
-
-    //check for comments
-    c = getc(fp);
-    while (c == '#') {
-    while (getc(fp) != '\n') ;
-         c = getc(fp);
-    }
-
-    ungetc(c, fp);
-    //read image size information
-    if (fscanf(fp, "%d %d", &img->x, &img->y) != 2) {
-         fprintf(stderr, "Invalid image size (error loading '%s')\n", filename);
-         exit(1);
-    }
-
-    //read rgb component
-    if (fscanf(fp, "%d", &rgb_comp_color) != 1) {
-         fprintf(stderr, "Invalid rgb component (error loading '%s')\n", filename);
-         exit(1);
-    }
-
-    //check rgb component depth
-    if (rgb_comp_color!= RGB_COMPONENT_COLOR) {
-         fprintf(stderr, "'%s' does not have 8-bits components\n", filename);
-         exit(1);
-    }
-
-    while (fgetc(fp) != '\n') ;
-    //memory allocation for pixel data
-    img->data = (PPMPixel*)malloc(img->x * img->y * sizeof(PPMPixel));
-
-    if (!img) {
-         fprintf(stderr, "Unable to allocate memory\n");
-         exit(1);
-    }
-
-    //read pixel data from file
-    if (fread(img->data, 3 * img->x, img->y, fp) != img->y) {
-         fprintf(stderr, "Error loading image '%s'\n", filename);
-         exit(1);
-    }
-
-    fclose(fp);
-    return img;
 }
