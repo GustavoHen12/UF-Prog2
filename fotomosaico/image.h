@@ -1,6 +1,7 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include<string.h>
+#include <math.h>
 
 #define STR_IMAGE_TYPE_SIZE 3
 #define RGB_COMPONENT_COLOR 255
@@ -16,6 +17,8 @@ typedef struct {
 } imagePPM;
 
 imagePPM *readPPM(const char *filename);
+
+pixel readImageData(imagePPM *image, FILE *file, int type);
 
 imagePPM *P3read(imagePPM *image, FILE *file);
 
