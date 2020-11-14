@@ -13,20 +13,16 @@
 //tiles.h
 
 int main (){
-   // imagePPM *tiles;
-   // tiles = malloc(sizeof(imagePPM)*MAX_TILES);
-   // readPPM("image3.ppm", &tiles[0]);
-   
    DIR *dirstream;
    struct dirent *direntry;
 
    //todo: colocar em um struct
    imagePPM *tiles;
-   //pixel *predominantColor;
+   pixel *predominantColor;
    tiles = malloc(sizeof(imagePPM)*MAX_TILES);
-   //predominantColor = malloc(sizeof(pixel)*MAX_TILES);
+   predominantColor = malloc(sizeof(pixel)*MAX_TILES);
   
-   char dirname[11] = "./tiles20/";
+   char dirname[11] = "./tiles32/";
   
    dirstream = opendir (dirname);
    if ( ! dirstream )
@@ -36,17 +32,23 @@ int main (){
    }
 
    int i = 0;
+   int count = 1;
    while (direntry = readdir (dirstream)){
       if(strcmp(direntry->d_name,".") == 0)
          continue;
       if(strcmp(direntry->d_name,"..") == 0)
          continue;
-      printf("> %d - %s", i, direntry->d_name);
+      printf("> %d - %s\n", i, direntry->d_name);
       char filename[FILE_NAME_SIZE];
       strcpy(filename, dirname);
       strcat(filename, direntry->d_name);
-      readPPM(filename, &tiles[i]);
+      predominantColor[i] = readPPM(filename, &tiles[i]);
       i++;
+      if(i >= MAX_TILES){
+         count++;
+         tiles = realloc(tiles, sizeof(imagePPM)*(MAX_TILES*count));
+         predominantColor = realloc(predominantColor, sizeof(imagePPM)*(MAX_TILES*count));
+      }
    }
    (void) closedir (dirstream);
 

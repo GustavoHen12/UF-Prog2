@@ -32,31 +32,28 @@ void imprimeFoto (imagePPM *image){
      printf("\n");
 }
 
-imagePPM *readPPM(const char *filename, imagePPM *image){
+pixel readPPM(const char *filename, imagePPM *image){
      //informacoes da imagem
      int maxValue = 0;
-     //imagePPM *image;
-     //PPMImage *img;
      FILE *imageFile;
      imageFile = fopen(filename, "r");
      if(!imageFile){
           perror("Não foi possivel abrir a imagem!");
           exit(1);
      }
-     //image = malloc(sizeof(imagePPM));
      //verificar tipo da imagem
      fgets(image->type, STR_IMAGE_TYPE_SIZE, imageFile);
      printLog("TIPO IMAGEM", image->type);
      
-     //cleanComents(imageFile);
+     cleanComents(imageFile);
 
      if(fscanf(imageFile, "%d %d,", &image->height, &image->width) != 2){
           perror("Erro ao ler tamanho da imagem");
           exit(1);
      }
-     // fscanf(imageFile, "%d", &image->width);
+     
      printf("[SIZE]: %d %d - ", image->height, image->width);
-     //cleanComents(imageFile);
+     cleanComents(imageFile);
 
      fscanf(imageFile, "%d", &maxValue);
      if(maxValue != 255){
@@ -78,12 +75,12 @@ imagePPM *readPPM(const char *filename, imagePPM *image){
      //imprimeFoto(image);
      printf("%d %d %d \n", md.red, md.green, md.blue);
      fclose(imageFile);
-     return image;
+     return md;
 }
 
 pixel readImageData(imagePPM *image, FILE *file, int type){
      int size = image->height * image->width;
-     long long int rTotal = 0, gTotal = 0, bTotal = 0;
+     long int rTotal = 0, gTotal = 0, bTotal = 0;
      int r = 0, g = 0, b = 0;
      pixel *px;
      pixel media;

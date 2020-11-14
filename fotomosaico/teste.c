@@ -134,7 +134,7 @@ void changeColorPPM(PPMImage *img)
 int main(){
     PPMImage *image;
     image = readPPM("image3.ppm");
-    printf("leu \n");
+    printf("leu     getchar();\n");
 //     changeColorPPM(image);
 //     writePPM("can_bottom2.ppm",image);
 //     printf("Press any key...");

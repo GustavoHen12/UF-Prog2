@@ -16,7 +16,7 @@ typedef struct {
      pixel *data;
 } imagePPM;
 
-imagePPM *readPPM(const char *filename, imagePPM *image);
+pixel readPPM(const char *filename, imagePPM *image);
 
 pixel readImageData(imagePPM *image, FILE *file, int type);
 
