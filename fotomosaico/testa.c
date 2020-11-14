@@ -11,7 +11,7 @@
    //carrega img
 
 //tiles.h
-
+//so pra testar o commit
 int main (){
     imagePPM *tiles;
     tiles = malloc(sizeof(imagePPM)*MAX_TILES);
