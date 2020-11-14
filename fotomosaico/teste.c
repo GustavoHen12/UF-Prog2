@@ -89,6 +89,7 @@ static PPMImage *readPPM(const char *filename)
     fclose(fp);
     return img;
 }
+
 void writePPM(const char *filename, PPMImage *img)
 {
     FILE *fp;
@@ -132,9 +133,9 @@ void changeColorPPM(PPMImage *img)
 
 int main(){
     PPMImage *image;
-    image = readPPM("can_bottom.ppm");
-    changeColorPPM(image);
-    writePPM("can_bottom2.ppm",image);
-    printf("Press any key...");
-    getchar();
+    image = readPPM("image3.ppm");
+    printf("leu \n");
+//     changeColorPPM(image);
+//     writePPM("can_bottom2.ppm",image);
+//     printf("Press any key...");
 }

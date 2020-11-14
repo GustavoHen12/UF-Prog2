@@ -32,10 +32,10 @@ void imprimeFoto (imagePPM *image){
      printf("\n");
 }
 
-imagePPM *readPPM(const char *filename){
+imagePPM *readPPM(const char *filename, imagePPM *image){
      //informacoes da imagem
      int maxValue = 0;
-     imagePPM *image;
+     //imagePPM *image;
      //PPMImage *img;
      FILE *imageFile;
      imageFile = fopen(filename, "r");
@@ -43,17 +43,20 @@ imagePPM *readPPM(const char *filename){
           perror("Não foi possivel abrir a imagem!");
           exit(1);
      }
-     image = malloc(sizeof(imagePPM));
+     //image = malloc(sizeof(imagePPM));
      //verificar tipo da imagem
      fgets(image->type, STR_IMAGE_TYPE_SIZE, imageFile);
      printLog("TIPO IMAGEM", image->type);
-
-     cleanComents(imageFile);
      
-     fscanf(imageFile, "%d", &image->height);
-     fscanf(imageFile, "%d", &image->width);
+     //cleanComents(imageFile);
 
-     cleanComents(imageFile);
+     if(fscanf(imageFile, "%d %d,", &image->height, &image->width) != 2){
+          perror("Erro ao ler tamanho da imagem");
+          exit(1);
+     }
+     // fscanf(imageFile, "%d", &image->width);
+     printf("[SIZE]: %d %d - ", image->height, image->width);
+     //cleanComents(imageFile);
 
      fscanf(imageFile, "%d", &maxValue);
      if(maxValue != 255){
@@ -61,7 +64,7 @@ imagePPM *readPPM(const char *filename){
           exit(1);
      }
 
-     cleanComents(imageFile);
+     //cleanComents(imageFile);
      image->data = malloc(image->height * image->width * sizeof(pixel));
      pixel md;
      if(strcmp(image->type, "P3") == 0){
@@ -108,40 +111,4 @@ pixel readImageData(imagePPM *image, FILE *file, int type){
      media.blue = (int)sqrt(bTotal/size);
      
      return media;
-}
-
-imagePPM *P3read(imagePPM *image, FILE *file){
-     int size = image->height * image->width;
-     long long int rTotal = 0, gTotal = 0, bTotal = 0;
-     int r = 0, g = 0, b = 0;
-     pixel *px;
-     for(int i = 0; i < size; i++){
-          if(fscanf(file, "%d %d %d", &r, &g, &b) != 3){
-               perror("Ocorreu um erro ao carregar a imagem !");
-               exit(1);
-          }
-          px = &(image->data[i]);
-          px->red = r;
-          px->green = g;
-          px->blue = b;
- 
-          rTotal += px->red*px->red;
-          gTotal += px->green*px->green;
-          bTotal += px->blue*px->blue;
-     }
-     return image;
-}
-
-imagePPM *P6read(imagePPM *image, FILE *file){
-     int size = image->height * image->width;
-     long long int rTotal = 0, gTotal = 0, bTotal = 0;
-     pixel *px;
-     for(int i = 0; i < size; i++){
-          px = &(image->data[i]);
-          rTotal += px->red*px->red;
-          gTotal += px->green*px->green;
-          bTotal += px->blue*px->blue;
-     }
-
-    return image;
 }

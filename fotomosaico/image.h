@@ -1,6 +1,6 @@
-#include<stdio.h>
-#include<stdlib.h>
-#include<string.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <math.h>
 
 #define STR_IMAGE_TYPE_SIZE 3
@@ -16,10 +16,8 @@ typedef struct {
      pixel *data;
 } imagePPM;
 
-imagePPM *readPPM(const char *filename);
+imagePPM *readPPM(const char *filename, imagePPM *image);
 
 pixel readImageData(imagePPM *image, FILE *file, int type);
 
-imagePPM *P3read(imagePPM *image, FILE *file);
-
-imagePPM *P6read(imagePPM *image, FILE *file);
+//writeInImage
