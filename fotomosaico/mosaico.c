@@ -44,7 +44,7 @@ int main (){
       strcat(filename, direntry->d_name);
       predominantColor[i] = readPPM(filename, &tiles[i]);
       i++;
-      if(i >= MAX_TILES){
+      if(i >= MAX_TILES){  
          count++;
          tiles = realloc(tiles, sizeof(imagePPM)*(MAX_TILES*count));
          predominantColor = realloc(predominantColor, sizeof(imagePPM)*(MAX_TILES*count));
