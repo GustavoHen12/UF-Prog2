@@ -20,4 +20,8 @@ pixel readPPM(const char *filename, imagePPM *image);
 
 pixel readImageData(imagePPM *image, FILE *file, int type);
 
-//writeInImage
+void writeImage(imagePPM *imgDest, imagePPM *imgSrc, int initialX, int initialY);
+
+// void imageToFile();
+
+// pixel *avaregeRGB();

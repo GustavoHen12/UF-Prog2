@@ -18,6 +18,10 @@ void cleanComents(FILE *file){
      fseek(file, -1*sizeof(char), SEEK_CUR);
 }
 
+int getIndex(int i, int j, int width){
+     return j + i*width;
+}
+
 void imprimeFoto (imagePPM *image){
      pixel *px;
      int k = 0;
@@ -109,3 +113,25 @@ pixel readImageData(imagePPM *image, FILE *file, int type){
      
      return media;
 }
+void copyPixel(imagePPM *image, int pos, pixel px){
+     pixel *newPx;
+     newPx = &(image->data[pos]);
+     newPx->red = px.red;
+     newPx->blue = px.blue;
+     newPx->green = px.green;
+}
+
+void writeImage(imagePPM *imgDest, imagePPM *imgSrc, int initialX, int initialY){
+     int indexSrc = 0;
+     pixel cpPixel;
+     int indexDest = initialX + initialY*imgDest->width;
+     for(int i = initialY; i < imgSrc->height; i++){
+          for(int j = initialX; j < imgSrc->width; j++){
+               indexDest = getIndex(i, j, imgSrc->width);
+               cpPixel = imgSrc->data[indexSrc];
+               copyPixel(imgDest, indexDest, cpPixel);
+               indexSrc++;
+          }
+     }
+}
+

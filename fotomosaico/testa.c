@@ -23,6 +23,9 @@ int main (){
 
     printf("TESTE IMG 3: \n");
     readPPM("image3.ppm", &tiles[2]);
+
+    printf("COPIA IMG 2 NA 3: \n");
+    writeImage(&tiles[0], &tiles[1], 0, 0);
     
     return 0;
 }
