@@ -9,10 +9,10 @@ void printLog(char *info, char *str){
 
 void cleanComents(FILE *file){
      char firstChar;
+     while (fgetc(file) != '\n');
      firstChar = fgetc(file);
-     while ((firstChar == '#') || (firstChar == '\n')){
-          while(firstChar != '\n')
-               firstChar = fgetc(file);
+     while ((firstChar == '#')){
+          while (fgetc(file) != '\n');
           firstChar = fgetc(file);
      }     
      fseek(file, -1*sizeof(char), SEEK_CUR);
@@ -28,13 +28,14 @@ void imprimeFoto (imagePPM *image){
      for(int i = 0; i < image->height; i++){
           for(int j = 0; j < image->width; j++){
                px = &(image->data[k]);
-               printf("( %d %d %d )", px->red, px->green, px->blue);
+               printf(" %d %d %d |", px->red, px->green, px->blue);
                k++;
           }
           printf("\n");
      }
      printf("\n");
 }
+
 int createImage(imagePPM *image, char *type, int height, int width){
      strcpy(image->type, type);
      image->height = height;
@@ -54,17 +55,25 @@ pixel readPPM(const char *filename, imagePPM *image){
      }
      //verificar tipo da imagem
      fgets(image->type, STR_IMAGE_TYPE_SIZE, imageFile);
-     printLog("TIPO IMAGEM", image->type);
-     
+     //printLog("TIPO IMAGEM", image->type);
+     //printLog("TIPO IMAGEM", image->type);
+
+     // char c;
+     // c = getc(imageFile);
+     // while (c == '#') {
+     //      while (getc(imageFile) != '\n') ;
+     //           c = getc(imageFile);
+     // }
+     // ungetc(c, imageFile);
      cleanComents(imageFile);
 
-     if(fscanf(imageFile, "%d %d,", &image->height, &image->width) != 2){
+     if(fscanf(imageFile, "%d %d,", &image->width, &image->height) != 2){
           perror("Erro ao ler tamanho da imagem");
           exit(1);
      }
      
-     printf("[SIZE]: %d %d - ", image->height, image->width);
-     cleanComents(imageFile);
+     //printf("[SIZE]: %d %d - ", image->height, image->width);
+     //cleanComents(imageFile);
 
      fscanf(imageFile, "%d", &maxValue);
      if(maxValue != 255){
@@ -72,19 +81,21 @@ pixel readPPM(const char *filename, imagePPM *image){
           exit(1);
      }
 
-     //cleanComents(imageFile);
      image->data = malloc(image->height * image->width * sizeof(pixel));
      pixel md;
+
+     while (fgetc(imageFile) != '\n') ;
+
      if(strcmp(image->type, "P3") == 0){
-          printf("LE TIPO P3 \n");
+          //printf("LE TIPO P3 \n");
           md = readImageData(image, imageFile, 3);
      }
      else{
-          printf("LE TIPO P6 \n");
+          //printf("LE TIPO P6 \n");
           md = readImageData(image, imageFile, 6);
      }
      //imprimeFoto(image);
-     printf("%d %d %d \n", md.red, md.green, md.blue);
+     //printf("%d %d %d \n", md.red, md.green, md.blue);
      fclose(imageFile);
      return md;
 }
@@ -123,33 +134,59 @@ pixel readImageData(imagePPM *image, FILE *file, int type){
 
 void copyPixel(imagePPM *image, int pos, pixel px){
      pixel *newPx;
+     // newPx = &(image->data[pos]);
+     // newPx->red = px.red;
+     // newPx->blue = px.blue;
+     // newPx->green = px.green;
+
      newPx = &(image->data[pos]);
      newPx->red = px.red;
      newPx->blue = px.blue;
      newPx->green = px.green;
+     //printf(" %d %d %d  - %d %d %d\n", newPx->red,newPx->blue, newPx->green, px.red, px.blue, px.green);
 }
 
-void writeImage(imagePPM *imgDest, imagePPM *imgSrc, int initialX, int initialY){
+int writeImage(imagePPM *imgDest, imagePPM *imgSrc, int initialX, int initialY){
      int indexSrc = 0;
      pixel cpPixel;
+     //printf("> %d %d <\n", initialX, initialY);
      int indexDest = initialX + initialY*imgDest->width;
-     for(int i = initialY; i < imgSrc->height; i++){
-          for(int j = initialX; j < imgSrc->width; j++){
+     int i = initialY, j = initialX;
+     int limitX = initialX + imgSrc->height, limitY = initialY + imgSrc->width;
+     //printf("%d %d - %d %d\n", limitX, limitY, i, j);
+     if(limitX < initialX || limitY < initialY){
+          perror("Ocorreu um erro ao copiar a regiao");
+          exit(1);
+     }
+     int count = 0;
+     for(i = initialY; i < limitY; i++){
+          for(j = initialX; j < limitX; j++){
+               if(j > imgDest->width || i > imgDest->height)
+                    continue;
                indexDest = getIndex(i, j, imgDest->width);//estava imgSrc
                cpPixel = imgSrc->data[indexSrc];
                copyPixel(imgDest, indexDest, cpPixel);
                indexSrc++;
+               count++;
           }
      }
+     if(count == 0){
+          printf("!!!NENHUM PIXEL COPIADO : %d %d %d %d %d %d \n", indexDest, indexSrc, i, j, limitX, limitY);
+     }
+     return count;
+     //printf("%d %d - %d %d\n", indexDest, indexSrc, i, j);
 }
 
 pixel getAvarageColor(imagePPM *image,int initialX, int initialY, int limitX, int limitY){
      pixel px;
      long int rTotal = 0, gTotal = 0, bTotal = 0;
      int index = initialX + initialY*image->width;
-     for(int i = initialY; i < initialY+limitY; i++){
-          for(int j = initialX; j < initialX+limitX; j++){
+     for(int i = initialX; i < initialX+limitX; i++){
+          for(int j = initialY; j < initialY+limitY; j++){
+               if(j > image->width || i > image->height)
+                    continue;
                index = getIndex(i, j, image->width);
+               //printf("%d \n", index);
                px = image->data[index];
                rTotal += px.red * px.red;
                gTotal += px.green * px.green;
@@ -168,16 +205,23 @@ pixel getAvarageColor(imagePPM *image,int initialX, int initialY, int limitX, in
 int distanceBetweenColors(pixel pxA, pixel pxB){
      // printf("> %d %d %d \n", pxA.red, pxA.green, pxA.blue);
      // printf("> %d %d %d \n", pxB.red, pxB.green, pxB.blue);
-     int dR = (pxA.red - pxB.red);
-     int dG = (pxA.green - pxB.green);
-     int dB = (pxA.blue - pxB.blue);
-     int lambda = (pxA.red + pxB.red) / 2;
+     int dR = pxA.red - pxB.red;
+     int dG = pxA.green - pxB.green;
+     int dB = pxA.blue - pxB.blue;
+     float r = (pxA.red + pxB.red);
 
-     int et1 = (2+(lambda/2))*dR*dR;
-     int et2 = 4*dG*dG;
-     int et3 = (2+((255-lambda)/2))*dB*dB;
+     int result;
+     if(r > 128){
+          result = sqrt((2*dR*dR)+(4*dG*dG)+(3*dB*dB));
+     }else{
+          result = sqrt((3*dR*dR)+(4*dG*dG)+(2*dB*dB));
+     }
 
-     int result = sqrt(et1+et2+et3);
+     // float et1 = (2+(r/256))*dR*dR;
+     // float et2 = 4*dG*dG;
+     // float et3 = (2+((255-r)/256))*dB*dB;
+
+     // int result = sqrt(et1+et2+et3);
      return result;
 }
 

@@ -29,7 +29,7 @@ imagePPM *readTiles(pixel *predominantColor, char *dirname, int *size){
          continue;
       if(strcmp(direntry->d_name,"..") == 0)
          continue;
-      printf("> %d - %s\n", i, direntry->d_name);
+      //printf("> %d - %s\n", i, direntry->d_name);
       char filename[FILE_NAME_SIZE];
       strcpy(filename, dirname);
       strcat(filename, direntry->d_name); //sprintf (nome_completo, "%s/%s", dir_name, file_name)
@@ -50,11 +50,12 @@ int getProxTile(pixel color, pixel *colorTiles, int size){
    int menorDist = distanceBetweenColors(color, colorTiles[0]), menorIndice = 0, dist = 0;
    for(int i = 0; i < size; i++){
       dist = distanceBetweenColors(color, colorTiles[i]);
-      if(dist < menorDist){
+      if(dist <= menorDist){
          menorDist = dist;
          menorIndice = i;
       }
    }
+   //printf("%d %d %d - %d %d %d \n", color.red, color.green, color.blue, colorTiles->red, colorTiles->green, colorTiles->blue);
    return menorIndice;
 }
 
@@ -69,33 +70,40 @@ int main (){
   
    char dirname[11] = "./tiles32/";
    tiles = readTiles(predominantColor, dirname, &size);
-   printf("\n%d\n", size);
+   //printf("\n%d\n", size);
 
    //LE IMAGEM
    imagePPM image;
-   readPPM("wallP3.ppm", &image);
+   readPPM("wallP65.ppm", &image);
 
    //cria copia
    imagePPM mosaico;
    createImage(&mosaico, image.type, image.height, image.width);
+   //writeImage(&mosaico, &tiles[545], 0, 51);
 
+//   getAvarageColor(&image, 0, 1216,32, 32);
    int tilesHeight = tiles[0].height;
    int tilesWidth = tiles[0].width;//tranformar em funcao
+
    pixel avarageColor;
+   int count, countPX;
    //percorre a imagem
-   for(int i = 0; i < image.height; i+= tilesWidth){
+   for(int i = 0; i < image.height; i+= tilesHeight){
       for(int j = 0; j < image.width; j+= tilesWidth){
-         //printf("%d %d - ", i, j);
          //calcula media
          avarageColor = getAvarageColor(&image, i, j, tilesWidth, tilesHeight);
          //acha mais proxima  
          int ind = getProxTile(avarageColor, predominantColor, size);
+         //printf("%d %d <> %d\n", i, j, ind);
          //printf("> %d \n", ind);
          //escreve imagem
-         writeImage(&mosaico, &tiles[ind], i, j);
+         countPX += writeImage(&mosaico, &tiles[ind], j, i);
+         count++;
+         //printf("-- %d \n", j);
       }
    }
-
+   printf("\n %d %d\n", count, countPX);
+   //imprimeFoto(&mosaico);
    //exporta imagem para arquivo
    imageToFile("output.ppm", &mosaico);
    return 0;

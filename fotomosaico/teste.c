@@ -133,13 +133,9 @@ void changeColorPPM(PPMImage *img)
 
 int main(){
     PPMImage *image;
-    image = readPPM("image3.ppm");
+    image = readPPM("wallP63.ppm");
     printf("leu     getchar();\n");
 //     changeColorPPM(image);
-//     writePPM("can_bottom2.ppm",image);
+     writePPM("outputTeste.ppm",image);
 //     printf("Press any key...");
-}
-
-pixel getAvarageColor(imagePPM *image,int initialX, int initialY, int limitX, int limitY){
-     pixel px;
 }
