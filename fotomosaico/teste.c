@@ -139,3 +139,7 @@ int main(){
 //     writePPM("can_bottom2.ppm",image);
 //     printf("Press any key...");
 }
+
+pixel getAvarageColor(imagePPM *image,int initialX, int initialY, int limitX, int limitY){
+     pixel px;
+}

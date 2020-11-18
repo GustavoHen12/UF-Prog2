@@ -22,6 +22,11 @@ pixel readImageData(imagePPM *image, FILE *file, int type);
 
 void writeImage(imagePPM *imgDest, imagePPM *imgSrc, int initialX, int initialY);
 
+int createImage(imagePPM *image, char *type, int height, int width);
 // void imageToFile();
 
-// pixel *avaregeRGB();
+pixel getAvarageColor(imagePPM *image,int initialX, int initialY, int limitX, int limitY);
+
+int distanceBetweenColors(pixel pxA, pixel pxB);
+
+void imageToFile(const char *filename, imagePPM *img);

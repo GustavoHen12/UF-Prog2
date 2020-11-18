@@ -35,7 +35,14 @@ void imprimeFoto (imagePPM *image){
      }
      printf("\n");
 }
+int createImage(imagePPM *image, char *type, int height, int width){
+     strcpy(image->type, type);
+     image->height = height;
+     image->width = width;
 
+     image->data = malloc(image->height * image->width * sizeof(pixel));
+     return 0;
+}
 pixel readPPM(const char *filename, imagePPM *image){
      //informacoes da imagem
      int maxValue = 0;
@@ -91,7 +98,7 @@ pixel readImageData(imagePPM *image, FILE *file, int type){
      for(int i = 0; i < size; i++){
           px = &(image->data[i]);
           if(type == 6){
-               fread(px, sizeof(pixel), 1, file);
+               fread(px, sizeof(pixel), 1, file);//verficacao
           }
           else{
                if(fscanf(file, "%d %d %d", &r, &g, &b) != 3){
@@ -113,6 +120,7 @@ pixel readImageData(imagePPM *image, FILE *file, int type){
      
      return media;
 }
+
 void copyPixel(imagePPM *image, int pos, pixel px){
      pixel *newPx;
      newPx = &(image->data[pos]);
@@ -127,7 +135,7 @@ void writeImage(imagePPM *imgDest, imagePPM *imgSrc, int initialX, int initialY)
      int indexDest = initialX + initialY*imgDest->width;
      for(int i = initialY; i < imgSrc->height; i++){
           for(int j = initialX; j < imgSrc->width; j++){
-               indexDest = getIndex(i, j, imgSrc->width);
+               indexDest = getIndex(i, j, imgDest->width);//estava imgSrc
                cpPixel = imgSrc->data[indexSrc];
                copyPixel(imgDest, indexDest, cpPixel);
                indexSrc++;
@@ -135,3 +143,68 @@ void writeImage(imagePPM *imgDest, imagePPM *imgSrc, int initialX, int initialY)
      }
 }
 
+pixel getAvarageColor(imagePPM *image,int initialX, int initialY, int limitX, int limitY){
+     pixel px;
+     long int rTotal = 0, gTotal = 0, bTotal = 0;
+     int index = initialX + initialY*image->width;
+     for(int i = initialY; i < initialY+limitY; i++){
+          for(int j = initialX; j < initialX+limitX; j++){
+               index = getIndex(i, j, image->width);
+               px = image->data[index];
+               rTotal += px.red * px.red;
+               gTotal += px.green * px.green;
+               bTotal += px.blue * px.blue;
+          }
+     }
+     int size = limitX*limitY;
+     px.red = (int)sqrt(rTotal/size);
+     px.green = (int)sqrt(gTotal/size);
+     px.blue = (int)sqrt(bTotal/size);
+
+     //printf("%d %d %d \n", px.red, px.green, px.blue);
+     return px;
+}
+
+int distanceBetweenColors(pixel pxA, pixel pxB){
+     // printf("> %d %d %d \n", pxA.red, pxA.green, pxA.blue);
+     // printf("> %d %d %d \n", pxB.red, pxB.green, pxB.blue);
+     int dR = (pxA.red - pxB.red);
+     int dG = (pxA.green - pxB.green);
+     int dB = (pxA.blue - pxB.blue);
+     int lambda = (pxA.red + pxB.red) / 2;
+
+     int et1 = (2+(lambda/2))*dR*dR;
+     int et2 = 4*dG*dG;
+     int et3 = (2+((255-lambda)/2))*dB*dB;
+
+     int result = sqrt(et1+et2+et3);
+     return result;
+}
+
+void imageToFile(const char *filename, imagePPM *img)
+{
+    FILE *fp;
+    //open file for output
+    fp = fopen(filename, "wb");
+    if (!fp) {
+         fprintf(stderr, "Unable to open file '%s'\n", filename);
+         exit(1);
+    }
+
+    //write the header file
+    //image format
+    fprintf(fp, "P6\n");
+
+    //comments
+    fprintf(fp, "# Created by \n");
+
+    //image size
+    fprintf(fp, "%d %d\n",img->width,img->height);
+
+    // rgb component depth
+    fprintf(fp, "%d\n",RGB_COMPONENT_COLOR);
+
+    // pixel data
+    fwrite(img->data, 3 * img->width, img->height, fp);
+    fclose(fp);
+}
