@@ -44,6 +44,7 @@ int createImage(imagePPM *image, char *type, int height, int width){
      image->data = malloc(image->height * image->width * sizeof(pixel));
      return 0;
 }
+
 pixel readPPM(const char *filename, imagePPM *image){
      //informacoes da imagem
      int maxValue = 0;
@@ -63,9 +64,6 @@ pixel readPPM(const char *filename, imagePPM *image){
           exit(1);
      }
      
-     //printf("[SIZE]: %d %d - ", image->height, image->width);
-     //cleanComents(imageFile);
-
      fscanf(imageFile, "%d", &maxValue);
      if(maxValue != 255){
           perror("Esta imagem não possui um formato valido");
@@ -78,15 +76,12 @@ pixel readPPM(const char *filename, imagePPM *image){
      while (fgetc(imageFile) != '\n') ;
 
      if(strcmp(image->type, "P3") == 0){
-          //printf("LE TIPO P3 \n");
           md = readImageData(image, imageFile, 3);
      }
      else{
-          //printf("LE TIPO P6 \n");
           md = readImageData(image, imageFile, 6);
      }
-     //imprimeFoto(image);
-     //printf("%d %d %d \n", md.red, md.green, md.blue);
+     
      fclose(imageFile);
      return md;
 }
@@ -125,33 +120,27 @@ pixel readImageData(imagePPM *image, FILE *file, int type){
 
 void copyPixel(imagePPM *image, int pos, pixel px){
      pixel *newPx;
-     // newPx = &(image->data[pos]);
-     // newPx->red = px.red;
-     // newPx->blue = px.blue;
-     // newPx->green = px.green;
-
      newPx = &(image->data[pos]);
      newPx->red = px.red;
      newPx->blue = px.blue;
      newPx->green = px.green;
-     //printf(" %d %d %d  - %d %d %d\n", newPx->red,newPx->blue, newPx->green, px.red, px.blue, px.green);
 }
 
 int writeImage(imagePPM *imgDest, imagePPM *imgSrc, int initialX, int initialY){
      int indexSrc = 0;
      pixel cpPixel;
-     //printf("> %d %d <\n", initialX, initialY);
      int indexDest = initialX + initialY*imgDest->width;
-     int i = initialY, j = initialX;
-     int limitX = initialX + imgSrc->height, limitY = initialY + imgSrc->width;
-     //printf("%d %d - %d %d\n", limitX, limitY, i, j);
+     int limitX = initialX + imgSrc->height;
+     int limitY = initialY + imgSrc->width;
+ 
      if(limitX < initialX || limitY < initialY){
           perror("Ocorreu um erro ao copiar a regiao");
           exit(1);
      }
+
      int count = 0;
-     for(i = initialY; i < limitY; i++){
-          for(j = initialX; j < limitX; j++){
+     for(int i = initialY; i < limitY; i++){
+          for(int j = initialX; j < limitX; j++){
                if(j > imgDest->width || i > imgDest->height)
                     continue;
                indexDest = getIndex(i, j, imgDest->width);//estava imgSrc
@@ -162,10 +151,9 @@ int writeImage(imagePPM *imgDest, imagePPM *imgSrc, int initialX, int initialY){
           }
      }
      if(count == 0){
-          printf("!!!NENHUM PIXEL COPIADO : %d %d %d %d %d %d \n", indexDest, indexSrc, i, j, limitX, limitY);
+          printf("!!!NENHUM PIXEL COPIADO : %d %d %d %d \n", indexDest, indexSrc, limitX, limitY);
      }
      return count;
-     //printf("%d %d - %d %d\n", indexDest, indexSrc, i, j);
 }
 
 pixel getAvarageColor(imagePPM *image,int initialX, int initialY, int limitX, int limitY){
@@ -189,13 +177,10 @@ pixel getAvarageColor(imagePPM *image,int initialX, int initialY, int limitX, in
      px.green = (int)sqrt(gTotal/size);
      px.blue = (int)sqrt(bTotal/size);
 
-     //printf("%d %d %d \n", px.red, px.green, px.blue);
      return px;
 }
 
 int distanceBetweenColors(pixel pxA, pixel pxB){
-     // printf("> %d %d %d \n", pxA.red, pxA.green, pxA.blue);
-     // printf("> %d %d %d \n", pxB.red, pxB.green, pxB.blue);
      int dR = pxA.red - pxB.red;
      int dG = pxA.green - pxB.green;
      int dB = pxA.blue - pxB.blue;
@@ -208,11 +193,6 @@ int distanceBetweenColors(pixel pxA, pixel pxB){
           result = sqrt((3*dR*dR)+(4*dG*dG)+(2*dB*dB));
      }
 
-     // float et1 = (2+(r/256))*dR*dR;
-     // float et2 = 4*dG*dG;
-     // float et3 = (2+((255-r)/256))*dB*dB;
-
-     // int result = sqrt(et1+et2+et3);
      return result;
 }
 

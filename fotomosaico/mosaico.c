@@ -14,12 +14,20 @@ typedef struct{
    int size;
 } Tiles_tp;
 
+int diretoryInvalid(struct dirent *direntry){
+   if(strcmp(direntry->d_name,".") == 0)
+      return 1;
+   if(strcmp(direntry->d_name,"..") == 0)
+      return 1;
+   if(direntry->d_type != DT_REG)
+      return 1;
+   return 0;
+}
 
 int readTiles( Tiles_tp *tiles, char *dirname){
    DIR *dirstream;
    struct dirent *direntry;
    
-   //imagePPM *tiles;
    tiles->images = malloc(sizeof(imagePPM)*MAX_TILES);
    tiles->avarageColors = malloc(sizeof(pixel)*MAX_TILES);
    
@@ -29,26 +37,29 @@ int readTiles( Tiles_tp *tiles, char *dirname){
       exit (1) ;
    }
 
-   int i = 0;
-   int count = 1;
-   while (direntry = readdir (dirstream)){
-      if(strcmp(direntry->d_name,".") == 0)
+   int tilesSize = 0, reallocCount = 1;
+   for(;;){
+      direntry = readdir (dirstream) ;
+      if (! direntry)
+        break ;
+
+      if(diretoryInvalid(direntry))
          continue;
-      if(strcmp(direntry->d_name,"..") == 0)
-         continue;
+
       char filename[FILE_NAME_SIZE];
       strcpy(filename, dirname);
       strcat(filename, direntry->d_name); //sprintf (nome_completo, "%s/%s", dir_name, file_name)
-      tiles->avarageColors[i] = readPPM(filename, &(tiles->images[i]));
-      i++;
-      if(i >= MAX_TILES){  
-         count++;
-         tiles->images = realloc(tiles->images, sizeof(imagePPM)*(MAX_TILES*count));
-         tiles->avarageColors = realloc(tiles->avarageColors, sizeof(imagePPM)*(MAX_TILES*count));
+      tiles->avarageColors[tilesSize] = readPPM(filename, &(tiles->images[tilesSize]));
+      tilesSize++;
+      if(tilesSize >= MAX_TILES){  
+         reallocCount++;
+         tiles->images = realloc(tiles->images, sizeof(imagePPM)*(MAX_TILES*reallocCount));
+         tiles->avarageColors = realloc(tiles->avarageColors, sizeof(imagePPM)*(MAX_TILES*reallocCount));
       }
    }
    (void) closedir (dirstream);
-   tiles->size = i;
+   tiles->size = tilesSize;
+
    return 0;
 }
 
