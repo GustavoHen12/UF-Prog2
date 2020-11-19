@@ -55,16 +55,7 @@ pixel readPPM(const char *filename, imagePPM *image){
      }
      //verificar tipo da imagem
      fgets(image->type, STR_IMAGE_TYPE_SIZE, imageFile);
-     //printLog("TIPO IMAGEM", image->type);
-     //printLog("TIPO IMAGEM", image->type);
 
-     // char c;
-     // c = getc(imageFile);
-     // while (c == '#') {
-     //      while (getc(imageFile) != '\n') ;
-     //           c = getc(imageFile);
-     // }
-     // ungetc(c, imageFile);
      cleanComents(imageFile);
 
      if(fscanf(imageFile, "%d %d,", &image->width, &image->height) != 2){

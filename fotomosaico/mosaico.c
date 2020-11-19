@@ -8,16 +8,23 @@
 #define MAX_TILES 1000
 #define FILE_NAME_SIZE 100
 
-imagePPM *readTiles(pixel *predominantColor, char *dirname, int *size){
+typedef struct{
+   imagePPM *images;
+   pixel *avarageColors;
+   int size;
+} Tiles_tp;
+
+
+int readTiles( Tiles_tp *tiles, char *dirname){
    DIR *dirstream;
    struct dirent *direntry;
    
-   imagePPM *tiles;
-   tiles = malloc(sizeof(imagePPM)*MAX_TILES);
+   //imagePPM *tiles;
+   tiles->images = malloc(sizeof(imagePPM)*MAX_TILES);
+   tiles->avarageColors = malloc(sizeof(pixel)*MAX_TILES);
    
    dirstream = opendir (dirname);
-   if ( ! dirstream )
-   {
+   if ( ! dirstream ){
       perror ("Couldn't open the directory");
       exit (1) ;
    }
@@ -29,21 +36,20 @@ imagePPM *readTiles(pixel *predominantColor, char *dirname, int *size){
          continue;
       if(strcmp(direntry->d_name,"..") == 0)
          continue;
-      //printf("> %d - %s\n", i, direntry->d_name);
       char filename[FILE_NAME_SIZE];
       strcpy(filename, dirname);
       strcat(filename, direntry->d_name); //sprintf (nome_completo, "%s/%s", dir_name, file_name)
-      predominantColor[i] = readPPM(filename, &tiles[i]);
+      tiles->avarageColors[i] = readPPM(filename, &(tiles->images[i]));
       i++;
       if(i >= MAX_TILES){  
          count++;
-         tiles = realloc(tiles, sizeof(imagePPM)*(MAX_TILES*count));
-         predominantColor = realloc(predominantColor, sizeof(imagePPM)*(MAX_TILES*count));
+         tiles->images = realloc(tiles->images, sizeof(imagePPM)*(MAX_TILES*count));
+         tiles->avarageColors = realloc(tiles->avarageColors, sizeof(imagePPM)*(MAX_TILES*count));
       }
    }
    (void) closedir (dirstream);
-   *(size) = i;
-   return tiles;
+   tiles->size = i;
+   return 0;
 }
 
 int getProxTile(pixel color, pixel *colorTiles, int size){
@@ -55,22 +61,14 @@ int getProxTile(pixel color, pixel *colorTiles, int size){
          menorIndice = i;
       }
    }
-   //printf("%d %d %d - %d %d %d \n", color.red, color.green, color.blue, colorTiles->red, colorTiles->green, colorTiles->blue);
    return menorIndice;
 }
 
 int main (){
    //INICIA TILES
-   //todo: colocar em um struct
-   imagePPM *tiles;
-   pixel *predominantColor;
-   int size;
-   tiles = malloc(sizeof(imagePPM)*MAX_TILES);
-   predominantColor = malloc(sizeof(pixel)*MAX_TILES);
-  
+   Tiles_tp tiles;
    char dirname[11] = "./tiles32/";
-   tiles = readTiles(predominantColor, dirname, &size);
-   //printf("\n%d\n", size);
+   readTiles(&tiles, dirname);
 
    //LE IMAGEM
    imagePPM image;
@@ -79,11 +77,9 @@ int main (){
    //cria copia
    imagePPM mosaico;
    createImage(&mosaico, image.type, image.height, image.width);
-   //writeImage(&mosaico, &tiles[545], 0, 51);
 
-//   getAvarageColor(&image, 0, 1216,32, 32);
-   int tilesHeight = tiles[0].height;
-   int tilesWidth = tiles[0].width;//tranformar em funcao
+   int tilesHeight = tiles.images[0].height;
+   int tilesWidth = tiles.images[0].width;
 
    pixel avarageColor;
    int count, countPX;
@@ -93,17 +89,12 @@ int main (){
          //calcula media
          avarageColor = getAvarageColor(&image, i, j, tilesWidth, tilesHeight);
          //acha mais proxima  
-         int ind = getProxTile(avarageColor, predominantColor, size);
-         //printf("%d %d <> %d\n", i, j, ind);
-         //printf("> %d \n", ind);
+         int ind = getProxTile(avarageColor, tiles.avarageColors, tiles.size);
          //escreve imagem
-         countPX += writeImage(&mosaico, &tiles[ind], j, i);
+         countPX += writeImage(&mosaico, &(tiles.images[ind]), j, i);
          count++;
-         //printf("-- %d \n", j);
       }
    }
-   printf("\n %d %d\n", count, countPX);
-   //imprimeFoto(&mosaico);
    //exporta imagem para arquivo
    imageToFile("output.ppm", &mosaico);
    return 0;
