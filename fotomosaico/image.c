@@ -49,10 +49,14 @@ pixel readPPM(const char *filename, imagePPM *image){
      //informacoes da imagem
      int maxValue = 0;
      FILE *imageFile;
-     imageFile = fopen(filename, "r");
-     if(!imageFile){
-          perror("Não foi possivel abrir a imagem!");
-          exit(1);
+     if(filename == NULL){
+          imageFile = stdin;
+     }else{
+          imageFile = fopen(filename, "r");
+          if(!imageFile){
+               perror("Não foi possivel abrir a imagem!");
+               exit(1);
+          }
      }
      //verificar tipo da imagem
      fgets(image->type, STR_IMAGE_TYPE_SIZE, imageFile);
@@ -208,10 +212,10 @@ void imageToFile(const char *filename, imagePPM *img)
 
     //write the header file
     //image format
-    fprintf(fp, "P6\n");
-
-    //comments
-    fprintf(fp, "# Created by \n");
+    if(strcmp(img->type, "P6") == 0) 
+         fprintf(fp, "P6\n");
+     else
+          fprintf(fp, "P3\n");
 
     //image size
     fprintf(fp, "%d %d\n",img->width,img->height);
@@ -220,6 +224,19 @@ void imageToFile(const char *filename, imagePPM *img)
     fprintf(fp, "%d\n",RGB_COMPONENT_COLOR);
 
     // pixel data
-    fwrite(img->data, 3 * img->width, img->height, fp);
+    if(strcmp(img->type, "P6") == 0)
+         fwrite(img->data, 3 * img->width, img->height, fp);
+    else{
+          pixel *px;
+          int k = 0;
+          for(int i = 0; i < img->height; i++){
+               for(int j = 0; j < img->width; j++){
+                    px = &(img->data[k]);
+                    fprintf(fp, "%d %d %d ", px->red, px->green, px->blue);
+                    k++;
+               }
+               fprintf(fp, "\n");
+          }
+     }
     fclose(fp);
 }
