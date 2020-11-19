@@ -78,12 +78,12 @@ int getProxTile(pixel color, pixel *colorTiles, int size){
 int main (){
    //INICIA TILES
    Tiles_tp tiles;
-   char dirname[11] = "./tiles32/";
+   char dirname[11] = "./tiles20/";
    readTiles(&tiles, dirname);
 
    //LE IMAGEM
    imagePPM image;
-   readPPM("wallP65.ppm", &image);
+   readPPM("wallP64.ppm", &image);
 
    //cria copia
    imagePPM mosaico;
