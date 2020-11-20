@@ -1,52 +1,4 @@
 #include "image.h"
-
-Pixel readImageData(ImagePPM *image, FILE *file, int type){
-     int size = image->height * image->width;
-     long int rTotal = 0, gTotal = 0, bTotal = 0;
-     int r = 0, g = 0, b = 0;
-     Pixel *px;
-     Pixel media;
-     for(int i = 0; i < size; i++){
-          px = &(image->data[i]);
-          if(type == 6){
-               fread(px, sizeof(Pixel), 1, file);//verficacao
-          }
-          else{
-               if(fscanf(file, "%d %d %d", &r, &g, &b) != 3){
-                    perror("Ocorreu um erro ao carregar a imagem !");
-                    exit(1);
-               }
-               px->red = r;
-               px->green = g;
-               px->blue = b;
-          }
-
-          rTotal += px->red*px->red;
-          gTotal += px->green*px->green;
-          bTotal += px->blue*px->blue;
-     }
-     media.red = (int)sqrt(rTotal/size);
-     media.green = (int)sqrt(gTotal/size);
-     media.blue = (int)sqrt(bTotal/size);
-     
-     return media;
-}
-
-void cleanComents(FILE *file){
-     char firstChar;
-     while (fgetc(file) != '\n');
-     firstChar = fgetc(file);
-     while ((firstChar == '#')){
-          while (fgetc(file) != '\n');
-          firstChar = fgetc(file);
-     }     
-     fseek(file, -1*sizeof(char), SEEK_CUR);
-}
-
-int getIndex(int i, int j, int width){
-     return j + i*width;
-}
-
 void imprimeFoto (ImagePPM *image){
      Pixel *px;
      int k = 0;
@@ -61,60 +13,153 @@ void imprimeFoto (ImagePPM *image){
      printf("\n");
 }
 
+
+//A partir um arquivo de imagem "file", carrega em "image.data"
+Pixel readImageData(ImagePPM *image, FILE *file){
+     //inicia as variaveis que serao utilizadas para calcular e retornar a cor média da imagem lida
+     //e o ponteiro para o pixel da imagem a ser lido
+     long int rTotal = 0, gTotal = 0, bTotal = 0;
+     Pixel avrgColor;
+     Pixel *px;
+     //a variavel type é utilizada para saber se a leitura sera de uma imagem tipo p6 ou p3
+     int type = strcmp(image->type, "P3") == 0 ? 3 : 6;
+     //cria a variavel size, com a quantidade de pixels que sera lida
+     int size = image->height * image->width;
+     for(int i = 0; i < size; i++){
+          //seleciona o pixel a ser lido
+          px = &(image->data[i]);
+          //le o pixel dependendo do tipo da imagem
+          if(type == 6){
+               if(fread(px, sizeof(Pixel), 1, file) != 1){
+                    fprintf(stderr,"Ocorreu um erro ao carregar a imagem !");
+                    exit(1);
+               }
+          }
+          else{
+               if(fscanf(file, "%hhd %hhd %hhd", &px->red, &px->green, &px->blue) != 3){
+                    fprintf(stderr,"Ocorreu um erro ao carregar a imagem !");
+                    exit(1);
+               }
+          }
+          //aramazena o quadrado do valor RGB para calculo da cor média
+          rTotal += px->red*px->red;
+          gTotal += px->green*px->green;
+          bTotal += px->blue*px->blue;
+     }
+
+     //calcula e retorna o valor da cor média
+     avrgColor.red = (int)sqrt(rTotal/size);
+     avrgColor.green = (int)sqrt(gTotal/size);
+     avrgColor.blue = (int)sqrt(bTotal/size);
+     return avrgColor;
+}
+
+//funcao para "pular" os possivei comentarios
+void cleanComents(FILE *file){
+     //vai para a próxima linha
+     gotoNextLine(file);
+     //verifica se a linha comeca com #, ou seja, se é comentario
+     //se sim vai para a próxima linha e verifica novamente
+     char firstChar;
+     firstChar = fgetc(file);
+     while ((firstChar == '#')){
+          gotoNextLine(file);
+          firstChar = fgetc(file);
+     }
+     //se a linha não for comentário, coloca o cursor no caracter inicial novamente     
+     fseek(file, -1*sizeof(char), SEEK_CUR);
+}
+
+//vai ate o final da linha atual, ou seja, consome o linha até o \n
+void gotoNextLine(FILE *file){
+     while (fgetc(file) != '\n') ;
+}
+
+//a partir de uma valor de i(eixo Y), j(eixo X) e o tamanho da imagem
+//retorna a posição do vetor que possui esta em (j, i) 
+int getIndex(int i, int j, int width){
+     return j + i*width;
+}
+
+//A partir de um ponteiro para uma imagem ppm "image"
+//seta seu tipo e tamanho, e aloca espaço para os pixels 
 int initImage(ImagePPM *image, char *type, int height, int width){
+     //copia o tipo para a imagem (P3 ou P6)
      strcpy(image->type, type);
+     //seta a altura e largura da imagem
      image->height = height;
      image->width = width;
-
+     //aloca espaço para posterior leitura dos pixels da imagem
      image->data = malloc(image->height * image->width * sizeof(Pixel));
      return 0;
 }
 
+int getImageHeight(ImagePPM *image){
+     return image->height;
+}
+
+int getImageWidth(ImagePPM *image){
+     return image->width;
+}
+
 Pixel readPPM(const char *filename, ImagePPM *image){
-     //informacoes da imagem
-     int maxValue = 0;
+     //informacoes da image
+     int maxValue, imgHeight, imgWidth;
+     char imgType[STR_IMAGE_TYPE_SIZE];
+
+     //Tenta abrir o arquivo da imagem, cujo nome é "filename"
+     //caso o "filename" seja nulo, a leitura sera realizada a partir da entrada padão
      FILE *imageFile;
      if(filename == NULL){
           imageFile = stdin;
      }else{
           imageFile = fopen(filename, "r");
           if(!imageFile){
-               perror("Não foi possivel abrir a imagem!");
+               fprintf(stderr,"Não foi possivel abrir a imagem!");
                exit(1);
           }
      }
-     //verificar tipo da imagem
-     fgets(image->type, STR_IMAGE_TYPE_SIZE, imageFile);
 
+     //HEADER
+     //Lê o formato da imagem e verifica se é valido
+     fgets(imgType, STR_IMAGE_TYPE_SIZE, imageFile);
+     if((strcmp(imgType, "P6") != 0) && (strcmp(imgType, "P6") != 0)){
+          fprintf(stderr,"Erro, formato de imagem inválido");
+          exit(1);
+     }
+     //Pula os possíveis comentários
      cleanComents(imageFile);
 
-     if(fscanf(imageFile, "%d %d,", &image->width, &image->height) != 2){
-          perror("Erro ao ler tamanho da imagem");
+     //Lê e verifica o tamanho da imagem
+     if(fscanf(imageFile, "%d %d,", &imgWidth, &imgHeight) != 2){
+          fprintf(stderr,"Erro ao ler tamanho da imagem");
           exit(1);
      }
      
+     //Lê o valor máximo de pixel da imagem
      fscanf(imageFile, "%d", &maxValue);
-     if(maxValue != 255){
-          perror("Esta imagem não possui um formato valido");
+     if(maxValue != MAX_COLOR_RGB){
+          fprintf(stderr,"Esta imagem não possui um formato valido, verifique se a imagem é de 8bits");
           exit(1);
      }
 
-     image->data = malloc(image->height * image->width * sizeof(Pixel));
-     Pixel md;
-
-     while (fgetc(imageFile) != '\n') ;
-
-     if(strcmp(image->type, "P3") == 0){
-          md = readImageData(image, imageFile, 3);
-     }
-     else{
-          md = readImageData(image, imageFile, 6);
-     }
+     //inicia a imagem, salvando os valores do header
+     initImage(image, imgType, imgHeight, imgWidth);
      
+     //DATA
+     //vai para próxima linha para leitura dos pixels da imagem
+     gotoNextLine(imageFile);
+     
+     //Lê os pixels da imagem, e salva o valor da cor média, em "md" que será o retorno da função
+     Pixel avarageColor;
+     avarageColor = readImageData(image, imageFile);
+     
+     //fecha o arquivo e retorna a cor média
      fclose(imageFile);
-     return md;
+     return avarageColor;
 }
 
+//copia o pixel "px" para a posicao "pos" de "image"
 void copyPixel(ImagePPM *image, int pos, Pixel px){
      Pixel *newPx;
      newPx = &(image->data[pos]);
@@ -123,66 +168,71 @@ void copyPixel(ImagePPM *image, int pos, Pixel px){
      newPx->green = px.green;
 }
 
-int writeImage(ImagePPM *imgDest, ImagePPM *imgSrc, int initialX, int initialY){
-     int indexSrc = 0;
+void writeImage(ImagePPM *imgDest, ImagePPM *imgSrc, int initialX, int initialY){
      Pixel cpPixel;
-     int indexDest = initialX + initialY*imgDest->width;
+     //Faz calculo da posicao inicial na imagem fonte e destino
+     int indexDest = initialX + initialY*imgDest->width, indexSrc = 0;
+     //calcula os limite da região a ser copiada
      int limitX = initialX + imgSrc->height;
      int limitY = initialY + imgSrc->width;
  
      if(limitX < initialX || limitY < initialY){
-          perror("Ocorreu um erro ao copiar a regiao");
+          fprintf(stderr,"Ocorreu um erro ao copiar a regiao");
           exit(1);
      }
 
-     int count = 0;
      for(int i = initialY; i < limitY; i++){
           for(int j = initialX; j < limitX; j++){
+               //caso a região seja maior que a imagem
                if(j > imgDest->width || i > imgDest->height)
                     continue;
-               indexDest = getIndex(i, j, imgDest->width);//estava imgSrc
+               //para cada pixel, calcula o indice na imagem fonte com base na posição
+               indexDest = getIndex(i, j, imgDest->width);
                cpPixel = imgSrc->data[indexSrc];
+               //copia pixel da imagem fonte para a destino
                copyPixel(imgDest, indexDest, cpPixel);
                indexSrc++;
-               count++;
           }
      }
-     if(count == 0){
-          printf("!!!NENHUM Pixel COPIADO : %d %d %d %d \n", indexDest, indexSrc, limitX, limitY);
-     }
-     return count;
 }
 
 Pixel getAvarageColor(ImagePPM *image,int initialX, int initialY, int offsetX, int offsetY){
+     //px corresponde ao pixel com a cor media da região
      Pixel px;
+     //variaveis que corresponderão a soma dos quadrados das cores da imagem
      long int rTotal = 0, gTotal = 0, bTotal = 0;
+     //index correspondente a posicao no vetor, com relação a "matriz" da imagem
      int index = initialX + initialY*image->width;
      for(int i = initialX; i < initialX+offsetX; i++){
           for(int j = initialY; j < initialY+offsetY; j++){
                if(j > image->width || i > image->height)
                     continue;
+               //calcula o indice e seleciona o pixel
                index = getIndex(i, j, image->width);
-               //printf("%d \n", index);
                px = image->data[index];
+               //soma o quadrado do valor de cada pixel para calculo da cor média
                rTotal += px.red * px.red;
                gTotal += px.green * px.green;
                bTotal += px.blue * px.blue;
           }
      }
+     //realiza calculo e retorna o valor
      int size = offsetX*offsetY;
      px.red = (int)sqrt(rTotal/size);
      px.green = (int)sqrt(gTotal/size);
      px.blue = (int)sqrt(bTotal/size);
-
      return px;
 }
 
 int distanceBetweenColors(Pixel pxA, Pixel pxB){
+     //calcula os deltas
      int dR = pxA.red - pxB.red;
      int dG = pxA.green - pxB.green;
      int dB = pxA.blue - pxB.blue;
+     //calculo de gama
      float r = (pxA.red + pxB.red);
 
+     //calculo redmean
      int result;
      if(r > 128){
           result = sqrt((2*dR*dR)+(4*dG*dG)+(3*dB*dB));
@@ -195,49 +245,47 @@ int distanceBetweenColors(Pixel pxA, Pixel pxB){
 
 void imageToFile(const char *filename, ImagePPM *img)
 {
-    FILE *fp;
-    //open file for output
-    fp = fopen(filename, "wb");
-    if (!fp) {
-         fprintf(stderr, "Unable to open file '%s'\n", filename);
-         exit(1);
+    FILE *file;
+    //Abre arquivo que será exportada a imagem
+    //caso filename seja null escreve na saida padrão
+    if(filename == NULL){
+         file = stdout;
+    }else{
+          file = fopen(filename, "wb");
+          if (!file) {
+               fprintf(stderr, "Não foi possível abrir o arquivo '%s'\n", filename);
+               exit(1);
+          }
     }
 
-    //write the header file
-    //image format
-    if(strcmp(img->type, "P6") == 0) 
-         fprintf(fp, "P6\n");
+     //Escreve cabeçao com o formato da imagem
+     if(strcmp(img->type, "P6") == 0) 
+         fprintf(file, "P6\n");
      else
-          fprintf(fp, "P3\n");
+          fprintf(file, "P3\n");
 
-    //image size
-    fprintf(fp, "%d %d\n",img->width,img->height);
+    //Escreve o tamanho da imagem
+    fprintf(file, "%d %d\n",img->width,img->height);
 
-    // rgb component depth
-    fprintf(fp, "%d\n",RGB_COMPONENT_COLOR);
+    //Escreve o tamanho máximo de cada cor
+    fprintf(file, "%d\n",MAX_COLOR_RGB);
 
-    // Pixel data
-    if(strcmp(img->type, "P6") == 0)
-         fwrite(img->data, 3 * img->width, img->height, fp);
-    else{
+    //Escre dados das imagens
+    if(strcmp(img->type, "P6") == 0){
+         fwrite(img->data, 3 * img->width, img->height, file);
+     }else{
+          //caso a imagem seja do tipo P3, escreve os pixels individualmente
           Pixel *px;
           int k = 0;
           for(int i = 0; i < img->height; i++){
                for(int j = 0; j < img->width; j++){
                     px = &(img->data[k]);
-                    fprintf(fp, "%d %d %d ", px->red, px->green, px->blue);
+                    fprintf(file, "%d %d %d ", px->red, px->green, px->blue);
                     k++;
                }
-               fprintf(fp, "\n");
+               fprintf(file, "\n");
           }
      }
-    fclose(fp);
+    fclose(file);
 }
 
-int getImageHeight(ImagePPM *image){
-     return image->height;
-}
-
-int getImageWidth(ImagePPM *image){
-     return image->width;
-}

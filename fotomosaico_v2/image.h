@@ -4,7 +4,7 @@
 #include <math.h>
 
 #define STR_IMAGE_TYPE_SIZE 3
-#define RGB_COMPONENT_COLOR 255
+#define MAX_COLOR_RGB 255
 
 typedef struct {
      unsigned char red,green,blue;
@@ -36,8 +36,9 @@ Pixel readPPM(const char *filename, ImagePPM *image);
 * a partir da posição "initialX", "initialY"
 * É importante salientar que mesmo que as imagens sejam em essẽncia um vetor, elas são tratadas como matrizes
 * portanto a escrita não é nessariamente linear na imagen destino
+* Retorna a quantidade de pixels escritos
 */
-int writeImage(ImagePPM *imgDest, ImagePPM *imgSrc, int initialX, int initialY);
+void writeImage(ImagePPM *imgDest, ImagePPM *imgSrc, int initialX, int initialY);
 
 /*
 * Calcula a cor média de uma região em "image", com inicio em "initialX", "initialY"

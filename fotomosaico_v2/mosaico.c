@@ -17,10 +17,8 @@ typedef struct{
    int size;
 } Tiles_t;
 
-//TODO: write na stdout
 //TODO: testar todas as possibilidas de escrita e leitura
-//TODO: refatorar readPPM, imagem como parametro e initImage
-//TODO: documentar image.c 
+//TODO: Makefile
 
 /*
 * Lê as pastilhas que serão ultilizadas.
