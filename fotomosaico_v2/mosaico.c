@@ -17,9 +17,6 @@ typedef struct{
    int size;
 } Tiles_t;
 
-//TODO: testar todas as possibilidas de escrita e leitura
-//TODO: Makefile
-
 /*
 * Lê as pastilhas que serão ultilizadas.
 * As pastilhas lidas, do diretório "dirname", são armazenadas em "tiles"
@@ -53,7 +50,10 @@ int main (int argc, char *argv[]){
    
    //verifica se o nome do diretorio esta correto,
    //ou seja se possui termina com '/', caso não possua é adicionado
-
+   if(!validDirectoryName(dirname)){
+      fprintf(stderr,"O diretorio informado não possui um formato valido, certifique-se que esle esteja no formato: /.../[diretorio]/\n");
+      exit(1);
+   }
    //Inicia pastilhas e as lê a partir do diretorio "dirname"
    Tiles_t tiles;
    readTiles(&tiles, dirname);

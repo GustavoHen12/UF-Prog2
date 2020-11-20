@@ -57,7 +57,7 @@ int main (){
     printf("TESTE LEITURA P6\n");
     ImagePPM image;
     //Pixel px;
-    readPPM("wallP63.ppm", &image);
-    imageToFile("outputTeste.ppm", &image);
+    readPPM("wallP33.ppm", &image);
+    imageToFile(NULL, &image);
     return 0;
 }

@@ -18,8 +18,8 @@ void filenameFormat(char **completeFilename, char* dirname, char *filename){
 }
 
 int validDirectoryName(char *dirname){
-    int lastChar = strlen(dirname);
-    if(dirname[lastChar] == '/')
-        return 1;
-    return 0;
+   int lastChar = strlen(dirname);
+   if(dirname[lastChar-1] == '/')
+      return 1;
+   return 0;
 }

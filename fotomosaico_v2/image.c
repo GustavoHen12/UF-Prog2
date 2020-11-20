@@ -54,6 +54,11 @@ Pixel readImageData(ImagePPM *image, FILE *file){
      return avrgColor;
 }
 
+//vai ate o final da linha atual, ou seja, consome o linha até o \n
+void gotoNextLine(FILE *file){
+     while (fgetc(file) != '\n') ;
+}
+
 //funcao para "pular" os possivei comentarios
 void cleanComents(FILE *file){
      //vai para a próxima linha
@@ -68,11 +73,6 @@ void cleanComents(FILE *file){
      }
      //se a linha não for comentário, coloca o cursor no caracter inicial novamente     
      fseek(file, -1*sizeof(char), SEEK_CUR);
-}
-
-//vai ate o final da linha atual, ou seja, consome o linha até o \n
-void gotoNextLine(FILE *file){
-     while (fgetc(file) != '\n') ;
 }
 
 //a partir de uma valor de i(eixo Y), j(eixo X) e o tamanho da imagem
@@ -115,7 +115,7 @@ Pixel readPPM(const char *filename, ImagePPM *image){
      }else{
           imageFile = fopen(filename, "r");
           if(!imageFile){
-               fprintf(stderr,"Não foi possivel abrir a imagem!");
+               fprintf(stderr,"Não foi possivel abrir a imagem!\n");
                exit(1);
           }
      }
@@ -123,8 +123,8 @@ Pixel readPPM(const char *filename, ImagePPM *image){
      //HEADER
      //Lê o formato da imagem e verifica se é valido
      fgets(imgType, STR_IMAGE_TYPE_SIZE, imageFile);
-     if((strcmp(imgType, "P6") != 0) && (strcmp(imgType, "P6") != 0)){
-          fprintf(stderr,"Erro, formato de imagem inválido");
+     if((strcmp(imgType, "P6") != 0) && (strcmp(imgType, "P3") != 0)){
+          fprintf(stderr,"Erro, formato de imagem inválido\n");
           exit(1);
      }
      //Pula os possíveis comentários
@@ -230,16 +230,10 @@ int distanceBetweenColors(Pixel pxA, Pixel pxB){
      int dG = pxA.green - pxB.green;
      int dB = pxA.blue - pxB.blue;
      //calculo de gama
-     float r = (pxA.red + pxB.red);
+     float gama = (pxA.red + pxB.red) / 2;
 
      //calculo redmean
-     int result;
-     if(r > 128){
-          result = sqrt((2*dR*dR)+(4*dG*dG)+(3*dB*dB));
-     }else{
-          result = sqrt((3*dR*dR)+(4*dG*dG)+(2*dB*dB));
-     }
-
+     int result = sqrt(((2+(gama/256))*dR*dR)+(4*dG*dG)+((2+((255-gama)/256))*dB*dB));
      return result;
 }
 
