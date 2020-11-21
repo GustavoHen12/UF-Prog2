@@ -1,26 +1,12 @@
 #include "image.h"
-void imprimeFoto (ImagePPM *image){
-     Pixel *px;
-     int k = 0;
-     for(int i = 0; i < image->height; i++){
-          for(int j = 0; j < image->width; j++){
-               px = &(image->data[k]);
-               printf(" %d %d %d |", px->red, px->green, px->blue);
-               k++;
-          }
-          printf("\n");
-     }
-     printf("\n");
-}
-
 
 //A partir um arquivo de imagem "file", carrega em "image.data"
-Pixel readImageData(ImagePPM *image, FILE *file){
+Pixel_t readImageData(ImagePPM_t *image, FILE *file){
      //inicia as variaveis que serao utilizadas para calcular e retornar a cor média da imagem lida
      //e o ponteiro para o pixel da imagem a ser lido
      long int rTotal = 0, gTotal = 0, bTotal = 0;
-     Pixel avrgColor;
-     Pixel *px;
+     Pixel_t avrgColor;
+     Pixel_t *px;
      //a variavel type é utilizada para saber se a leitura sera de uma imagem tipo p6 ou p3
      int type = strcmp(image->type, "P3") == 0 ? 3 : 6;
      //cria a variavel size, com a quantidade de pixels que sera lida
@@ -30,7 +16,7 @@ Pixel readImageData(ImagePPM *image, FILE *file){
           px = &(image->data[i]);
           //le o pixel dependendo do tipo da imagem
           if(type == 6){
-               if(fread(px, sizeof(Pixel), 1, file) != 1){
+               if(fread(px, sizeof(Pixel_t), 1, file) != 1){
                     fprintf(stderr,"Ocorreu um erro ao carregar a imagem !");
                     exit(1);
                }
@@ -83,27 +69,19 @@ int getIndex(int i, int j, int width){
 
 //A partir de um ponteiro para uma imagem ppm "image"
 //seta seu tipo e tamanho, e aloca espaço para os pixels 
-int initImage(ImagePPM *image, char *type, int height, int width){
+int initImage(ImagePPM_t *image, char *type, int height, int width){
      //copia o tipo para a imagem (P3 ou P6)
      strcpy(image->type, type);
      //seta a altura e largura da imagem
      image->height = height;
      image->width = width;
      //aloca espaço para posterior leitura dos pixels da imagem
-     image->data = malloc(image->height * image->width * sizeof(Pixel));
+     image->data = malloc(image->height * image->width * sizeof(Pixel_t));
      return 0;
 }
 
-int getImageHeight(ImagePPM *image){
-     return image->height;
-}
-
-int getImageWidth(ImagePPM *image){
-     return image->width;
-}
-
-Pixel readPPM(const char *filename, ImagePPM *image){
-     //informacoes da image
+Pixel_t readPPM(const char *filename, ImagePPM_t *image){
+     //informacoes da imagem
      int maxValue, imgHeight, imgWidth;
      char imgType[STR_IMAGE_TYPE_SIZE];
 
@@ -151,7 +129,7 @@ Pixel readPPM(const char *filename, ImagePPM *image){
      gotoNextLine(imageFile);
      
      //Lê os pixels da imagem, e salva o valor da cor média, em "md" que será o retorno da função
-     Pixel avarageColor;
+     Pixel_t avarageColor;
      avarageColor = readImageData(image, imageFile);
      
      //fecha o arquivo e retorna a cor média
@@ -159,17 +137,27 @@ Pixel readPPM(const char *filename, ImagePPM *image){
      return avarageColor;
 }
 
+int getImageHeight(ImagePPM_t *image){
+     //retorna largura da imagem
+     return image->height;
+}
+
+int getImageWidth(ImagePPM_t *image){
+     //retorna largura da imagem
+     return image->width;
+}
+
 //copia o pixel "px" para a posicao "pos" de "image"
-void copyPixel(ImagePPM *image, int pos, Pixel px){
-     Pixel *newPx;
+void copyPixel(ImagePPM_t *image, int pos, Pixel_t px){
+     Pixel_t *newPx;
      newPx = &(image->data[pos]);
      newPx->red = px.red;
      newPx->blue = px.blue;
      newPx->green = px.green;
 }
 
-void writeImage(ImagePPM *imgDest, ImagePPM *imgSrc, int initialX, int initialY){
-     Pixel cpPixel;
+void writeImage(ImagePPM_t *imgDest, ImagePPM_t *imgSrc, int initialX, int initialY){
+     Pixel_t cpPixel;
      //Faz calculo da posicao inicial na imagem fonte e destino
      int indexDest = initialX + initialY*imgDest->width, indexSrc = 0;
      //calcula os limite da região a ser copiada
@@ -196,9 +184,9 @@ void writeImage(ImagePPM *imgDest, ImagePPM *imgSrc, int initialX, int initialY)
      }
 }
 
-Pixel getAvarageColor(ImagePPM *image,int initialX, int initialY, int offsetX, int offsetY){
+Pixel_t getAvarageColor(ImagePPM_t *image,int initialX, int initialY, int offsetX, int offsetY){
      //px corresponde ao pixel com a cor media da região
-     Pixel px;
+     Pixel_t px;
      //variaveis que corresponderão a soma dos quadrados das cores da imagem
      long int rTotal = 0, gTotal = 0, bTotal = 0;
      //index correspondente a posicao no vetor, com relação a "matriz" da imagem
@@ -224,7 +212,7 @@ Pixel getAvarageColor(ImagePPM *image,int initialX, int initialY, int offsetX, i
      return px;
 }
 
-int distanceBetweenColors(Pixel pxA, Pixel pxB){
+int distanceBetweenColors(Pixel_t pxA, Pixel_t pxB){
      //calcula os deltas
      int dR = pxA.red - pxB.red;
      int dG = pxA.green - pxB.green;
@@ -237,7 +225,7 @@ int distanceBetweenColors(Pixel pxA, Pixel pxB){
      return result;
 }
 
-void imageToFile(const char *filename, ImagePPM *img)
+void imageToFile(const char *filename, ImagePPM_t *img)
 {
     FILE *file;
     //Abre arquivo que será exportada a imagem
@@ -269,7 +257,7 @@ void imageToFile(const char *filename, ImagePPM *img)
          fwrite(img->data, 3 * img->width, img->height, file);
      }else{
           //caso a imagem seja do tipo P3, escreve os pixels individualmente
-          Pixel *px;
+          Pixel_t *px;
           int k = 0;
           for(int i = 0; i < img->height; i++){
                for(int j = 0; j < img->width; j++){
