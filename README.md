@@ -8,7 +8,9 @@ Prof: Maziero
 
 - /tentativa1/VerificadorOrtografico/
 
-`./ortografi [dicionario] < entrada.txt > saida.txt`
+- [Especificações do projeto](http://wiki.inf.ufpr.br/maziero/doku.php?id=prog2:verificador_ortografico)
+
+`./ortografia [dicionario] < entrada.txt > saida.txt`
 
 ### Entrada
 
@@ -38,10 +40,12 @@ salvo em outro [TCB], é denominado "troca de contexto".
 
 ## Fotomosaico
 
-_"Um fotomosaico ou mosaico fotográfico é uma fotografia construída a partir de imagens menores, ou “pastilhas” (do inglês tiles). As pastilhas são escolhidas de forma a reproduzir a cor e intensidade luminosa do bloco da imagem original correspondente, gerando um efeito visual muito interessante."
+_"Um fotomosaico ou mosaico fotográfico é uma fotografia construída a partir de imagens menores, ou “pastilhas” (do inglês tiles). As pastilhas são escolhidas de forma a reproduzir a cor e intensidade luminosa do bloco da imagem original correspondente, gerando um efeito visual muito interessante."_
 
 - [Especificações do projeto](http://wiki.inf.ufpr.br/maziero/doku.php?id=prog2:fotomosaico)
 - [link imagem](https://unsplash.com/photos/MDyyjPovaWA)
+
+`./mosaico -p ./tiles/ -i input.ppm -o output.ppm`
 
 ### Imagem fonte
 
