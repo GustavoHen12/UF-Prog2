@@ -13,19 +13,19 @@
 //tiles.h
 //so pra testar o commit
 int main (){
-    // ImagePPM *tiles;
-    // tiles = malloc(sizeof(ImagePPM)*MAX_TILES);
-    // printf("TESTE IMG 1: \n");
-    // readPPM("image.ppm", &tiles[0]);
+    ImagePPM_t *tiles;
+    tiles = malloc(sizeof(ImagePPM_t)*MAX_TILES);
+    printf("TESTE IMG 1: \n");
+    readPPM("image.ppm", &tiles[0]);
 
-    // printf("TESTE IMG 2: \n");
-    // readPPM("image2.ppm", &tiles[1]);
+    printf("TESTE IMG 2: \n");
+    readPPM("image2.ppm", &tiles[1]);
 
-    // printf("TESTE IMG 3: \n");
-    // readPPM("image3.ppm", &tiles[2]);
+    printf("TESTE IMG 3: \n");
+    readPPM("image3.ppm", &tiles[2]);
 
-    // printf("COPIA IMG 2 NA 3: \n");
-    // writeImage(&tiles[0], &tiles[1], 0, 0);
+    printf("COPIA IMG 2 NA 3: \n");
+    writeImage(&tiles[0], &tiles[1], 0, 0);
 
     // printf("TESTA COR MEDIA\n");
     // imagePPM image;
@@ -54,10 +54,10 @@ int main (){
     // printf("\n %d %d \n", tiles[0].height, tiles[0].width);
     // writeImage(&mosaico, &tiles[547], 672, 547);
 
-    printf("TESTE LEITURA P6\n");
-    ImagePPM image;
-    //Pixel px;
-    readPPM("wallP33.ppm", &image);
-    imageToFile(NULL, &image);
+    // printf("TESTE LEITURA P6\n");
+    // ImagePPM image;
+    // //Pixel px;
+    // readPPM("wallP33.ppm", &image);
+    // imageToFile(NULL, &image);
     return 0;
 }

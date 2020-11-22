@@ -6,7 +6,7 @@ int diretoryInvalid(struct dirent *direntry){
       return 1;
    if(strcmp(direntry->d_name,"..") == 0)
       return 1;
-   //verifica se 
+   //verifica se é arquivo
    if(direntry->d_type != DT_REG)
       return 1;
    return 0;

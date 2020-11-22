@@ -113,7 +113,9 @@ Pixel_t readPPM(const char *filename, ImagePPM_t *image){
           fprintf(stderr,"Erro ao ler tamanho da imagem");
           exit(1);
      }
-     
+     //Pula os possíveis comentários
+     cleanComents(imageFile);
+
      //Lê o valor máximo de pixel da imagem
      fscanf(imageFile, "%d", &maxValue);
      if(maxValue != MAX_COLOR_RGB){
@@ -123,11 +125,10 @@ Pixel_t readPPM(const char *filename, ImagePPM_t *image){
 
      //inicia a imagem, salvando os valores do header
      initImage(image, imgType, imgHeight, imgWidth);
-     
-     //DATA
      //vai para próxima linha para leitura dos pixels da imagem
      gotoNextLine(imageFile);
-     
+
+     //DATA     
      //Lê os pixels da imagem, e salva o valor da cor média, em "md" que será o retorno da função
      Pixel_t avarageColor;
      avarageColor = readImageData(image, imageFile);
